@@ -15,6 +15,7 @@ public class adm_tiendas extends javax.swing.JFrame {
     public adm_tiendas() {
         initComponents();
     }
+    //este codigo esta para que no se abra mas de una vez el formulario
     public static adm_tiendas getObj(){
         if(obj== null){
             obj = new adm_tiendas();
