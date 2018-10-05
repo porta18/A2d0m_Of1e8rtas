@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog" prefer="system">
+    <system systemId="http://localhost/WCF_Portafolio/Service.svc" uri="xml-resources/web-service-references/Service/wsdl/localhost/WCF_Portafolio/Service.svc.xml"/>
+    <system systemId="http://localhost/WebServicesInventario/Computador_WS.asmx?wsdl" uri="xml-resources/web-service-references/Computador_WS_1/wsdl/localhost/WebServicesInventario/Computador_WS.asmx.wsdl"/>
+    <system systemId="http://localhost/WebServicesInventario/Computador_WS.asmx" uri="xml-resources/web-service-references/Computador_WS_2/wsdl/localhost/WebServicesInventario/Computador_WS.asmx"/>
+    <system systemId="http://localhost/WCF_Portafolio/Service.svc?wsdl" uri="xml-resources/web-service-references/Service/wsdl/localhost/WCF_Portafolio/Service.svc.wsdl"/>
+    <system systemId="http://localhost/WCF_Portafolio/Service.svc?xsd=xsd0" uri="xml-resources/web-service-references/Service/wsdl/localhost/WCF_Portafolio/Service.svc.xsd_xsd0.xsd"/>
+    <system systemId="http://localhost/WCF_Portafolio/Service.svc?xsd=xsd1" uri="xml-resources/web-service-references/Service/wsdl/localhost/WCF_Portafolio/Service.svc.xsd_xsd1.xsd"/>
+    <system systemId="http://localhost/WCF_Portafolio/Service.svc?xsd=xsd2" uri="xml-resources/web-service-references/Service/wsdl/localhost/WCF_Portafolio/Service.svc.xsd_xsd2.xsd"/>
+    <system systemId="http://fvsoluciones-001-site1.ftempurl.com/Service1.svc?singleWsdl" uri="xml-resources/web-service-references/Service1/wsdl/fvsoluciones-001-site1.ftempurl.com/Service1.svc.singlewsdl.wsdl"/>
+</catalog>
