@@ -13,6 +13,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import Clases.Usuario;
 import Clases.UsuarioSesion;
+import java.awt.event.KeyEvent;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -65,6 +66,12 @@ public class Login extends javax.swing.JFrame {
 
         jLabel2.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         jLabel2.setText("Contraseña        :");
+
+        jpasContraseña.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                jpasContraseñaKeyPressed(evt);
+            }
+        });
 
         btn_ingresar.setText("Ingresar");
         btn_ingresar.addActionListener(new java.awt.event.ActionListener() {
@@ -161,7 +168,7 @@ public class Login extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btn_ingresarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_ingresarActionPerformed
+    public void validar() {
         String user = txtUsuario.getText();
         String pass = String.valueOf(jpasContraseña.getPassword());
 
@@ -170,7 +177,7 @@ public class Login extends javax.swing.JFrame {
         String retorno = "";
 
         if (!user.equals("") && !pass.equals("")) {
-             retorno = usuWS.WSfn_Login(user, pass);
+            retorno = usuWS.WSfn_Login(user, pass);
             if (!retorno.equals("<NewDataSet />")) {
                 try {
 
@@ -205,17 +212,16 @@ public class Login extends javax.swing.JFrame {
                     for (int i = 0; i < list.size(); i++) {
 
                         Element node = (Element) list.get(i);
-                    
+
                         usu.setNombre(node.getChildText("USU_NOMBRE"));
                         usu.setClave(node.getChildText("USU_CLAVE"));
                         usu.setVigencia(Integer.parseInt(node.getChildText("USU_VIGENCIA")));
                         usu.setEmail(node.getChildText("USU_EMAIL"));
                         usu.setDescripcion_tipo_usuario(node.getChildText("T_USU_DESCRIPCION"));
                         usu.setPersona_id(Integer.parseInt(node.getChildText("PERSONA_PRS_ID")));
- 
+
                     }
                     UsuarioSesion.UsuSesion = usu;
-            
 
                     Home home = new Home();
                     home.setVisible(true);
@@ -230,16 +236,25 @@ public class Login extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(null, "Datos ingresados "
                         + "no validos");
             }
-        }else{
-         JOptionPane.showMessageDialog(null, "Ingrese Usuario y Contraseña");
+        } else {
+            JOptionPane.showMessageDialog(null, "Ingrese Usuario y Contraseña");
         }
+    }
+    private void btn_ingresarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_ingresarActionPerformed
 
+        this.validar();
 
     }//GEN-LAST:event_btn_ingresarActionPerformed
 
     private void btn_cancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_cancelarActionPerformed
         this.dispose();
     }//GEN-LAST:event_btn_cancelarActionPerformed
+
+    private void jpasContraseñaKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jpasContraseñaKeyPressed
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            this.validar();
+        }
+    }//GEN-LAST:event_jpasContraseñaKeyPressed
 
     /**
      * @param args the command line arguments

@@ -7,6 +7,7 @@ package Vista;
 
 import Clases.Usuario;
 import Clases.UsuarioSesion;
+import javax.swing.JFrame;
 
 /**
  *
@@ -21,6 +22,7 @@ public class Home extends javax.swing.JFrame {
 
         initComponents();
 
+        this.setExtendedState(JFrame.MAXIMIZED_BOTH);
         Usuario usu = UsuarioSesion.UsuSesion;
 
         lblNombreLoad.setText(usu.getNombre());
@@ -58,11 +60,12 @@ public class Home extends javax.swing.JFrame {
         mi_tiendas = new javax.swing.JMenuItem();
         jMenuItem3 = new javax.swing.JMenuItem();
         jMenuItem4 = new javax.swing.JMenuItem();
+        mi_adm_ofertas = new javax.swing.JMenuItem();
         jMenu5 = new javax.swing.JMenu();
         jMenuItem7 = new javax.swing.JMenuItem();
         jMenuItem8 = new javax.swing.JMenuItem();
         jMenu8 = new javax.swing.JMenu();
-        jMenuItem5 = new javax.swing.JMenuItem();
+        mi_administrar_oferta = new javax.swing.JMenuItem();
         jMenuItem6 = new javax.swing.JMenuItem();
 
         jMenu3.setText("File");
@@ -76,6 +79,7 @@ public class Home extends javax.swing.JFrame {
         jMenu7.setText("jMenu7");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
 
         jPanel1.setBackground(new java.awt.Color(102, 102, 255));
 
@@ -165,6 +169,14 @@ public class Home extends javax.swing.JFrame {
         jMenuItem4.setText("Descuentos");
         jMenu2.add(jMenuItem4);
 
+        mi_adm_ofertas.setText("Ofertas");
+        mi_adm_ofertas.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mi_adm_ofertasActionPerformed(evt);
+            }
+        });
+        jMenu2.add(mi_adm_ofertas);
+
         jMenuBar1.add(jMenu2);
 
         jMenu5.setText("Reportes");
@@ -179,8 +191,8 @@ public class Home extends javax.swing.JFrame {
 
         jMenu8.setText("Ofertas");
 
-        jMenuItem5.setText("Publicar");
-        jMenu8.add(jMenuItem5);
+        mi_administrar_oferta.setText("Publicar");
+        jMenu8.add(mi_administrar_oferta);
 
         jMenuItem6.setText("jMenuItem6");
         jMenu8.add(jMenuItem6);
@@ -215,6 +227,10 @@ public class Home extends javax.swing.JFrame {
          
         adm_tiendas.getObj().setVisible(true);
     }//GEN-LAST:event_mi_tiendasActionPerformed
+
+    private void mi_adm_ofertasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mi_adm_ofertasActionPerformed
+        crear_oferta.getObj().setVisible(true);
+    }//GEN-LAST:event_mi_adm_ofertasActionPerformed
 
     /**
      * @param args the command line arguments
@@ -265,7 +281,6 @@ public class Home extends javax.swing.JFrame {
     private javax.swing.JMenuBar jMenuBar2;
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JMenuItem jMenuItem4;
-    private javax.swing.JMenuItem jMenuItem5;
     private javax.swing.JMenuItem jMenuItem6;
     private javax.swing.JMenuItem jMenuItem7;
     private javax.swing.JMenuItem jMenuItem8;
@@ -275,6 +290,8 @@ public class Home extends javax.swing.JFrame {
     private javax.swing.JLabel lblCargoTitulo;
     private javax.swing.JLabel lblNombreLoad;
     private javax.swing.JLabel lblNombreTitulo;
+    private javax.swing.JMenuItem mi_adm_ofertas;
+    private javax.swing.JMenuItem mi_administrar_oferta;
     private javax.swing.JMenuItem mi_tiendas;
     private javax.swing.JMenuItem mi_usuarios;
     // End of variables declaration//GEN-END:variables
