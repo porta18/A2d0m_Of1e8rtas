@@ -218,8 +218,11 @@ public class adm_tiendas extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
+        
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
+                
+                
                 new adm_tiendas().setVisible(true);
             }
         });
