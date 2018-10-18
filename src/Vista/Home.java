@@ -23,6 +23,7 @@ public class Home extends javax.swing.JFrame {
         initComponents();
 
         this.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        
         Usuario usu = UsuarioSesion.UsuSesion;
 
         lblNombreLoad.setText(usu.getNombre());
@@ -30,6 +31,7 @@ public class Home extends javax.swing.JFrame {
 
       
         lblCargoLoad.setText(usu.getDescripcion_tipo_usuario());
+         
     }
 
     /**
@@ -62,7 +64,7 @@ public class Home extends javax.swing.JFrame {
         jMenuItem4 = new javax.swing.JMenuItem();
         mi_adm_ofertas = new javax.swing.JMenuItem();
         jMenu5 = new javax.swing.JMenu();
-        jMenuItem7 = new javax.swing.JMenuItem();
+        mi_valoracion_ofertas = new javax.swing.JMenuItem();
         jMenuItem8 = new javax.swing.JMenuItem();
         jMenu8 = new javax.swing.JMenu();
         mi_administrar_oferta = new javax.swing.JMenuItem();
@@ -181,8 +183,13 @@ public class Home extends javax.swing.JFrame {
 
         jMenu5.setText("Reportes");
 
-        jMenuItem7.setText("Valoracion Ofertas");
-        jMenu5.add(jMenuItem7);
+        mi_valoracion_ofertas.setText("Valoracion Ofertas");
+        mi_valoracion_ofertas.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mi_valoracion_ofertasActionPerformed(evt);
+            }
+        });
+        jMenu5.add(mi_valoracion_ofertas);
 
         jMenuItem8.setText("Resumen por Tienda");
         jMenu5.add(jMenuItem8);
@@ -224,13 +231,17 @@ public class Home extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void mi_tiendasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mi_tiendasActionPerformed
-         
+
         adm_tiendas.getObj().setVisible(true);
     }//GEN-LAST:event_mi_tiendasActionPerformed
 
     private void mi_adm_ofertasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mi_adm_ofertasActionPerformed
         crear_oferta.getObj().setVisible(true);
     }//GEN-LAST:event_mi_adm_ofertasActionPerformed
+
+    private void mi_valoracion_ofertasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mi_valoracion_ofertasActionPerformed
+
+    }//GEN-LAST:event_mi_valoracion_ofertasActionPerformed
 
     /**
      * @param args the command line arguments
@@ -282,7 +293,6 @@ public class Home extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JMenuItem jMenuItem4;
     private javax.swing.JMenuItem jMenuItem6;
-    private javax.swing.JMenuItem jMenuItem7;
     private javax.swing.JMenuItem jMenuItem8;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
@@ -294,5 +304,6 @@ public class Home extends javax.swing.JFrame {
     private javax.swing.JMenuItem mi_administrar_oferta;
     private javax.swing.JMenuItem mi_tiendas;
     private javax.swing.JMenuItem mi_usuarios;
+    private javax.swing.JMenuItem mi_valoracion_ofertas;
     // End of variables declaration//GEN-END:variables
 }

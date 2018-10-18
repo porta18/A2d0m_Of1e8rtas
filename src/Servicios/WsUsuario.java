@@ -13,8 +13,8 @@ public class WsUsuario {
     
      public String WSfn_Login(java.lang.String usu, java.lang.String pass) {
          
-        org.tempuri.Service1 service = new org.tempuri.Service1();
-        org.tempuri.IService1 port = service.getBasicHttpBindingIService1();
+        org.tempuri.Consultas service = new org.tempuri.Consultas();
+        org.tempuri.IConsultas port = service.getBasicHttpBindingIConsultas();
         return port.loginUsuario(usu, pass);
     }
 

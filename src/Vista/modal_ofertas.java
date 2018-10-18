@@ -9,7 +9,21 @@ import java.awt.event.MouseEvent;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import Clases.Oferta;
+import Clases.Usuario;
+import Clases.UsuarioSesion;
 import java.util.Set;
+import Servicios.WsOferta;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.input.SAXBuilder;
+
 /**
  *
  * @author Sony
@@ -21,24 +35,68 @@ public class modal_ofertas extends javax.swing.JFrame {
      */
     private static modal_ofertas obj = null;
     private static crear_oferta first = null;
- 
+
+    public void cargarTablaOfertas(Integer tnd_id) {
+
+        WsOferta ws = new WsOferta();
+        String retorno = "";
+        retorno = ws.WSfn_TraerEncabezadoOfertas(tnd_id);
+
+        if (!retorno.equals("<NewDataSet />")) {
+            try {
+                SAXBuilder builder = new SAXBuilder();
+
+                InputStream stream = new ByteArrayInputStream(retorno.getBytes("UTF-8"));
+                Document document = builder.build(stream);
+
+                //Document document = (Document) builder.build(retorno);
+                Element rootNode = document.getRootElement();
+                java.util.List<Element> list = rootNode.getChildren("Table");
+
+                String encabezadoTabla[] = {"ID", "Campaña", "Publica", "Cant. Productos", "Fecha inicio", "Fecha Termino", "Ispublica"};
+                DefaultTableModel tableModel = new DefaultTableModel(encabezadoTabla, 0);
+
+                for (int i = 0; i < list.size(); i++) {
+
+                    Element node = (Element) list.get(i);
+
+                    String id = node.getChildText("OFT_ID");
+                    String campania = node.getChildText("CAMPANIA");
+                    String publica = node.getChildText("ES_PUBLICA");
+                    String cantProductos = node.getChildText("CANTIDAD_PRODUCTOS");
+                    String fechaIni = node.getChildText("OFT_FECHA_INI");
+                    String fechaFin = node.getChildText("OFT_FECHA_FIN");
+                    String codIspubica = node.getChildText("OFT_PUBLICA");
+
+                    Object[] objs = {id, campania, publica, cantProductos,fechaIni,fechaFin,codIspubica};
+                    tableModel.addRow(objs);
+                }
+                tbl_ofertas.setModel(tableModel);
+                /*bloqueo la tabla para no ser editada*/
+                tbl_ofertas.setDefaultEditor(Object.class, null);
+                
+                tbl_ofertas.removeColumn(tbl_ofertas.getColumnModel().getColumn(4));
+                tbl_ofertas.removeColumn(tbl_ofertas.getColumnModel().getColumn(4));
+                tbl_ofertas.removeColumn(tbl_ofertas.getColumnModel().getColumn(4));
+                
+            } catch (JDOMException ex) {
+                Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+        } else {
+            lbl_mensaje.setText("No se encontraron ofertas creadas para esta tienda");
+            pnl_info.setVisible(true);
+        }
+
+    }
+
     public modal_ofertas() {
         initComponents();
-        
-        /*****inicio **** -> codigo para cargar una tabla*/
-        String col[] = {"Pos", "Team", "P", "W", "L"};
-        DefaultTableModel tableModel = new DefaultTableModel(col, 0);
+        pnl_info.setVisible(false);
+        cargarTablaOfertas(1);
 
-        for (int i = 1; i < 6; i++) {
-            Object[] objs = {i, "Arsenal", 35, 11, 2};
-            tableModel.addRow(objs);
-        }   
-        tbl_ofertas.setModel(tableModel);
-         /*****fin **** -> codigo para cargar una tabla*/
-        
-        /*bloque la tabla para no ser editada*/
-        tbl_ofertas.setDefaultEditor(Object.class, null);
-        
     }
 
     public static modal_ofertas getObj(crear_oferta f) {
@@ -64,6 +122,8 @@ public class modal_ofertas extends javax.swing.JFrame {
         btn_seleccionar = new javax.swing.JButton();
         btn_cancelar = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
+        pnl_info = new javax.swing.JPanel();
+        lbl_mensaje = new javax.swing.JLabel();
 
         tbl_ofertas.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -100,6 +160,24 @@ public class modal_ofertas extends javax.swing.JFrame {
         jLabel1.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
         jLabel1.setText("Seleccione una Oferta");
 
+        lbl_mensaje.setText("[label mensaje]");
+
+        javax.swing.GroupLayout pnl_infoLayout = new javax.swing.GroupLayout(pnl_info);
+        pnl_info.setLayout(pnl_infoLayout);
+        pnl_infoLayout.setHorizontalGroup(
+            pnl_infoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnl_infoLayout.createSequentialGroup()
+                .addGap(49, 49, 49)
+                .addComponent(lbl_mensaje)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        pnl_infoLayout.setVerticalGroup(
+            pnl_infoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnl_infoLayout.createSequentialGroup()
+                .addGap(0, 12, Short.MAX_VALUE)
+                .addComponent(lbl_mensaje))
+        );
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -113,19 +191,22 @@ public class modal_ofertas extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(btn_seleccionar))
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 365, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addComponent(pnl_info, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 498, Short.MAX_VALUE))
                 .addContainerGap())
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(153, 153, 153)
                 .addComponent(jLabel1)
-                .addGap(87, 87, 87))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 79, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 42, Short.MAX_VALUE)
+                .addComponent(pnl_info, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(10, 10, 10)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -155,7 +236,7 @@ public class modal_ofertas extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btn_cancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_cancelarActionPerformed
-
+        obj = null;
         this.dispose();
     }//GEN-LAST:event_btn_cancelarActionPerformed
 
@@ -166,19 +247,24 @@ public class modal_ofertas extends javax.swing.JFrame {
     }//GEN-LAST:event_tbl_ofertasMousePressed
 
     private void btn_seleccionarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_seleccionarActionPerformed
-        
+
         String data1 = tbl_ofertas.getValueAt(tbl_ofertas.getSelectedRow(), 0).toString();
         String data2 = tbl_ofertas.getValueAt(tbl_ofertas.getSelectedRow(), 1).toString();
         if (data1.trim().equals("")) {
             JOptionPane.showMessageDialog(null, "Seleccione una oferta");
 
         } else {
-     
-            Oferta oft = new Oferta();            
+            /*prueba de campos ocultos */
+             JOptionPane.showMessageDialog(null, tbl_ofertas.getModel().getValueAt(tbl_ofertas.getSelectedRow(),4));
+             JOptionPane.showMessageDialog(null, tbl_ofertas.getModel().getValueAt(tbl_ofertas.getSelectedRow(),5));
+             JOptionPane.showMessageDialog(null, tbl_ofertas.getModel().getValueAt(tbl_ofertas.getSelectedRow(),6));
+             
+            Oferta oft = new Oferta();
             oft.setId(Integer.parseInt(data1));
             oft.setTienda(data2);
-            
+
             first.cargar_oferta(oft);
+            obj = null;
             this.dispose();
         }
 
@@ -225,6 +311,8 @@ public class modal_ofertas extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JLabel lbl_mensaje;
+    private javax.swing.JPanel pnl_info;
     private javax.swing.JTable tbl_ofertas;
     // End of variables declaration//GEN-END:variables
 }
