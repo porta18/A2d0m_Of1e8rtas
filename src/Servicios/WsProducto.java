@@ -9,14 +9,12 @@ package Servicios;
  *
  * @author Sony
  */
-public class WsUsuario {
-    
-     public String WSfn_Login(java.lang.String usu, java.lang.String pass) {
-         
+public class WsProducto {
+    public String WSfn_TraerProductosOferta(java.lang.Integer tnd_id) {
+
+        
         org.tempuri.Consultas service = new org.tempuri.Consultas();
         org.tempuri.IConsultas port = service.getBasicHttpBindingIConsultas();
-        return port.loginUsuario("jquezada", "123");
+        return port.traeProductosTienda(tnd_id);
     }
-
-   
 }

@@ -5,11 +5,26 @@
  */
 package Vista;
 
+import Vista.modal.modal_productos;
+import Vista.modal.modal_ofertas;
 import Clases.Oferta;
+import Clases.Producto;
+import Servicios.WsOferta;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.text.Format;
+import java.text.SimpleDateFormat;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.input.SAXBuilder;
 
 /**
  *
@@ -17,27 +32,76 @@ import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
  */
 public class crear_oferta extends javax.swing.JFrame {
 
-    /**
-     * Creates new form crear_oferta
-     */
+    public String encabezadoTablaP[] = {"ID", "Cod Barra", "Descripcion", "Precio venta", "Precio Oferta"};
+    public DefaultTableModel tableModelP = new DefaultTableModel(encabezadoTablaP, 0);
+
     private static crear_oferta obj = null;
 
     public crear_oferta() {
         initComponents();
         pnl_detalle.setVisible(false);
+
+        tableModelP.setRowCount(0);
+
         AutoCompleteDecorator.decorate(cbo_tipo_oferta);
+        cbo_tipo_oferta.addItem("Visible String 1");
+        cbo_tipo_oferta.addItem("Visible String 2");
+        cbo_tipo_oferta.addItem("Visible String 3");
+    }
 
-        String col[] = {"Pos", "Team", "P", "W", "L"};
-        DefaultTableModel tableModel = new DefaultTableModel(col, 0);
+    public void cargar_tabla(Integer oft_id) {
 
-        for (int i = 1; i < 6; i++) {
-            Object[] objs = {i, "Arsenal", 35, 11, 2};
-            tableModel.addRow(objs);
+        WsOferta ws = new WsOferta();
+        String retorno = "";
+        retorno = ws.WSfn_TraerDetalleOfertas(oft_id);
+
+        if (!retorno.equals("<NewDataSet />")) {
+            try {
+                SAXBuilder builder = new SAXBuilder();
+
+                InputStream stream = new ByteArrayInputStream(retorno.getBytes("UTF-8"));
+                Document document = builder.build(stream);
+
+                //Document document = (Document) builder.build(retorno);
+                Element rootNode = document.getRootElement();
+                java.util.List<Element> list = rootNode.getChildren("Table");
+
+                String encabezadoTabla[] = {"ID", "Cod Barra", "Descripcion", "Precio venta", "Precio Oferta", "Detalle ID"};
+                DefaultTableModel tableModel = new DefaultTableModel(encabezadoTabla, 0);
+                tableModel.setRowCount(0);
+
+                for (int i = 0; i < list.size(); i++) {
+
+                    Element node = (Element) list.get(i);
+
+                    String prd_id = node.getChildText("PRODUCTO_PRD_ID");
+                    String cod_barra = node.getChildText("CODIGO_BARRA");
+                    String descripcion = node.getChildText("PRD_DESCRIPCION");
+                    String pVenta = node.getChildText("PRD_PRECIO_VENTA");
+                    String pOferta = node.getChildText("DTO_PRECIO_OFERTA");
+                    String detalleId = node.getChildText("DTO_ID");
+
+                    Object[] objs = {prd_id, cod_barra, descripcion, pVenta, pOferta, detalleId};
+                    tableModel.addRow(objs);
+                }
+                tbl_productos.setModel(tableModel);
+                /*bloqueo la tabla para no ser editada*/
+                tbl_productos.setDefaultEditor(Object.class, null);
+
+                tbl_productos.removeColumn(tbl_productos.getColumnModel().getColumn(5));
+
+            } catch (JDOMException ex) {
+                Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+        } else {
+            /*
+            lbl_mensaje.setText("No se encontraron ofertas creadas para esta tienda");
+            pnl_info.setVisible(true);
+             */
         }
-
-        /*bloque la tabla para no ser editada*/
-        tbl_productos.setDefaultEditor(Object.class, null);
-        tbl_productos.setModel(tableModel);
 
     }
 
@@ -50,8 +114,47 @@ public class crear_oferta extends javax.swing.JFrame {
 
     public void cargar_oferta(Oferta oft) {
         pnl_detalle.setVisible(true);
-        JOptionPane.showMessageDialog(null, oft.getTienda());
+        pnl_detalle.setVisible(true);
+        if (oft.getPublica() == 1) {
+            chk_publicar.setSelected(true);
+        }
 
+        Format formatter = new SimpleDateFormat("dd-MM-YYYY");
+        String sFechaIni = formatter.format(oft.getFechaInicio());
+        String sFechaFin = formatter.format(oft.getFechaTermino());
+
+        txt_desde.setText(sFechaIni);
+        txt_hasta.setText(sFechaFin);
+        cargar_tabla(oft.getId());
+
+    }
+
+    public void agregar_producto(Producto pro) {
+
+        Integer id = pro.getId();
+        Integer pVenta = pro.getPrecioVenta();
+        String cod_barra = pro.getCodBarra();
+        String descripcion = pro.getDescripcion();
+        Integer pOferta = 0;
+
+        Object[] objs = {id, cod_barra, descripcion, pVenta, pOferta};
+        tableModelP.addRow(objs);
+
+        tbl_productos.setModel(tableModelP);
+        /*bloqueo la tabla para no ser editada*/
+        tbl_productos.setDefaultEditor(Object.class, null);
+
+    }
+
+    public void limpiar_form() {
+        chk_publicar.setSelected(false);
+        txt_desde.setText("");
+        txt_hasta.setText("");
+
+        String encabezadoTabla[] = {"ID", "Cod Barra", "Descripcion", "Precio venta", "Precio Oferta"};
+        DefaultTableModel tableModel = new DefaultTableModel(encabezadoTabla, 0);
+        tableModel.setRowCount(0);
+        tbl_productos.setModel(tableModel);
     }
 
     /**
@@ -75,7 +178,7 @@ public class crear_oferta extends javax.swing.JFrame {
         tbl_productos = new javax.swing.JTable();
         cbo_tipo_oferta = new javax.swing.JComboBox<>();
         jLabel1 = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
+        btn_guardar = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
         btn_buscar_producto = new javax.swing.JButton();
@@ -83,7 +186,7 @@ public class crear_oferta extends javax.swing.JFrame {
         jLabel5 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
-        jCheckBox1 = new javax.swing.JCheckBox();
+        chk_publicar = new javax.swing.JCheckBox();
         txt_hasta = new javax.swing.JFormattedTextField();
         txt_desde = new javax.swing.JFormattedTextField();
         jPanel2 = new javax.swing.JPanel();
@@ -175,6 +278,11 @@ public class crear_oferta extends javax.swing.JFrame {
         );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+        });
 
         tbl_productos.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -189,17 +297,25 @@ public class crear_oferta extends javax.swing.JFrame {
         ));
         jScrollPane1.setViewportView(tbl_productos);
 
-        cbo_tipo_oferta.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "uno", "dos", "tres", "cuatro", "uno uno", "dos dos", "tres tres", "uno dos tres", "dos tres cuatro" }));
-
         jLabel1.setText("Tipo Oferta");
 
-        jButton1.setText("Guardar");
+        btn_guardar.setText("Guardar");
+        btn_guardar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_guardarActionPerformed(evt);
+            }
+        });
 
         jButton2.setText("Cancelar");
 
         jLabel2.setText("Agregar producto");
 
         btn_buscar_producto.setText("Buscar");
+        btn_buscar_producto.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_buscar_productoActionPerformed(evt);
+            }
+        });
 
         jLabel4.setText("Desde");
 
@@ -211,17 +327,17 @@ public class crear_oferta extends javax.swing.JFrame {
         jLabel7.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         jLabel7.setText("Lista productos ");
 
-        jCheckBox1.setText("Publicar");
-        jCheckBox1.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
+        chk_publicar.setText("Publicar");
+        chk_publicar.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
 
-        txt_hasta.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.DateFormatter(new java.text.SimpleDateFormat("dd-mm-yyyy"))));
+        txt_hasta.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.DateFormatter(new java.text.SimpleDateFormat("dd-MM-yyyy"))));
         txt_hasta.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txt_hastaActionPerformed(evt);
             }
         });
 
-        txt_desde.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.DateFormatter(new java.text.SimpleDateFormat("dd-mm-yyyy"))));
+        txt_desde.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.DateFormatter(new java.text.SimpleDateFormat("dd-MM-yyyy"))));
         txt_desde.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txt_desdeActionPerformed(evt);
@@ -249,7 +365,7 @@ public class crear_oferta extends javax.swing.JFrame {
                                     .addGroup(pnl_detalleLayout.createSequentialGroup()
                                         .addComponent(cbo_tipo_oferta, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addGap(75, 75, 75)
-                                        .addComponent(jCheckBox1))
+                                        .addComponent(chk_publicar))
                                     .addComponent(btn_buscar_producto)
                                     .addGroup(pnl_detalleLayout.createSequentialGroup()
                                         .addGap(29, 29, 29)
@@ -267,7 +383,7 @@ public class crear_oferta extends javax.swing.JFrame {
                         .addGap(22, 22, 22)
                         .addComponent(jButton2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jButton1)))
+                        .addComponent(btn_guardar)))
                 .addContainerGap())
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnl_detalleLayout.createSequentialGroup()
                 .addGap(0, 0, Short.MAX_VALUE)
@@ -279,7 +395,7 @@ public class crear_oferta extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnl_detalleLayout.createSequentialGroup()
                 .addContainerGap(39, Short.MAX_VALUE)
                 .addGroup(pnl_detalleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jCheckBox1)
+                    .addComponent(chk_publicar)
                     .addGroup(pnl_detalleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(cbo_tipo_oferta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(jLabel1)))
@@ -301,7 +417,7 @@ public class crear_oferta extends javax.swing.JFrame {
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 123, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addGroup(pnl_detalleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton1)
+                    .addComponent(btn_guardar)
                     .addComponent(jButton2))
                 .addContainerGap())
         );
@@ -385,12 +501,14 @@ public class crear_oferta extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btn_buscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_buscarActionPerformed
-     
+        pnl_detalle.setVisible(false);
+        limpiar_form();
         modal_ofertas.getObj(this).setVisible(true);
     }//GEN-LAST:event_btn_buscarActionPerformed
 
     private void btn_nuevoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_nuevoActionPerformed
         pnl_detalle.setVisible(true);
+        limpiar_form();
 
     }//GEN-LAST:event_btn_nuevoActionPerformed
 
@@ -401,6 +519,20 @@ public class crear_oferta extends javax.swing.JFrame {
     private void txt_desdeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_desdeActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txt_desdeActionPerformed
+
+    private void btn_buscar_productoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_buscar_productoActionPerformed
+
+        modal_productos.getObj(this).setVisible(true);
+    }//GEN-LAST:event_btn_buscar_productoActionPerformed
+
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        limpiar_form();
+    }//GEN-LAST:event_formWindowClosing
+
+    private void btn_guardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_guardarActionPerformed
+        WsOferta ws = new WsOferta();
+        ws.WSfn_GuardaEncabezadoOferta("", "", 1, 1);
+    }//GEN-LAST:event_btn_guardarActionPerformed
 
     /**
      * @param args the command line arguments
@@ -440,11 +572,11 @@ public class crear_oferta extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btn_buscar;
     private javax.swing.JButton btn_buscar_producto;
+    private javax.swing.JButton btn_guardar;
     private javax.swing.JButton btn_nuevo;
     private javax.swing.JComboBox<String> cbo_tipo_oferta;
-    private javax.swing.JButton jButton1;
+    private javax.swing.JCheckBox chk_publicar;
     private javax.swing.JButton jButton2;
-    private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JDialog jDialog1;
     private javax.swing.JDialog jDialog2;

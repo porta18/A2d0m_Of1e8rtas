@@ -3,22 +3,23 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package Vista;
+package Vista.modal;
 
+import Clases.Producto;
+import Servicios.WsProducto;
+import Vista.Login;
+import Vista.crear_oferta;
 import java.awt.event.MouseEvent;
-import javax.swing.JOptionPane;
-import javax.swing.table.DefaultTableModel;
-import Clases.Oferta;
-import Clases.Usuario;
-import Clases.UsuarioSesion;
-import java.util.Set;
-import Servicios.WsOferta;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -28,19 +29,25 @@ import org.jdom2.input.SAXBuilder;
  *
  * @author Sony
  */
-public class modal_ofertas extends javax.swing.JFrame {
+public class modal_productos extends javax.swing.JFrame {
+
+    private static modal_productos obj = null;
+    private static crear_oferta first = null;
 
     /**
-     * Creates new form modal_ofertas
+     * Creates new form modal_productos
      */
-    private static modal_ofertas obj = null;
-    private static crear_oferta first = null;
+    public modal_productos() {
+        initComponents();
+        pnl_info.setVisible(false);
+        cargarTablaOfertas(1);
+    }
 
     public void cargarTablaOfertas(Integer tnd_id) {
 
-        WsOferta ws = new WsOferta();
+        WsProducto ws = new WsProducto();
         String retorno = "";
-        retorno = ws.WSfn_TraerEncabezadoOfertas(tnd_id);
+        retorno = ws.WSfn_TraerProductosOferta(tnd_id);
 
         if (!retorno.equals("<NewDataSet />")) {
             try {
@@ -53,32 +60,30 @@ public class modal_ofertas extends javax.swing.JFrame {
                 Element rootNode = document.getRootElement();
                 java.util.List<Element> list = rootNode.getChildren("Table");
 
-                String encabezadoTabla[] = {"ID", "Campaña", "Publica", "Cant. Productos", "Fecha inicio", "Fecha Termino", "Ispublica"};
+                String encabezadoTabla[] = {"ID", "Cod Barra", "Descripcion", "Precio venta", "Categoria", "Categoria ID"};
                 DefaultTableModel tableModel = new DefaultTableModel(encabezadoTabla, 0);
 
                 for (int i = 0; i < list.size(); i++) {
 
                     Element node = (Element) list.get(i);
 
-                    String id = node.getChildText("OFT_ID");
-                    String campania = node.getChildText("CAMPANIA");
-                    String publica = node.getChildText("ES_PUBLICA");
-                    String cantProductos = node.getChildText("CANTIDAD_PRODUCTOS");
-                    String fechaIni = node.getChildText("OFT_FECHA_INI");
-                    String fechaFin = node.getChildText("OFT_FECHA_FIN");
-                    String codIspubica = node.getChildText("OFT_PUBLICA");
+                    String id = node.getChildText("PRD_ID");
+                    String cod_barra = node.getChildText("CODIGO_BARRA");
+                    String descripcion = node.getChildText("PRD_DESCRIPCION");
+                    String precio = node.getChildText("PRD_PRECIO_VENTA");
+                    String categoria = node.getChildText("CTG_DESCRIPCION");
+                    String categoria_id = node.getChildText("CATEGORIA_CTG_ID");
 
-                    Object[] objs = {id, campania, publica, cantProductos,fechaIni,fechaFin,codIspubica};
+                    Object[] objs = {id, cod_barra, descripcion, precio, categoria, categoria_id};
                     tableModel.addRow(objs);
                 }
-                tbl_ofertas.setModel(tableModel);
+                tbl_productos.setModel(tableModel);
                 /*bloqueo la tabla para no ser editada*/
-                tbl_ofertas.setDefaultEditor(Object.class, null);
-                
-                tbl_ofertas.removeColumn(tbl_ofertas.getColumnModel().getColumn(4));
-                tbl_ofertas.removeColumn(tbl_ofertas.getColumnModel().getColumn(4));
-                tbl_ofertas.removeColumn(tbl_ofertas.getColumnModel().getColumn(4));
-                
+                tbl_productos.setDefaultEditor(Object.class, null);
+
+                tbl_productos.removeColumn(tbl_productos.getColumnModel().getColumn(4));
+                tbl_productos.removeColumn(tbl_productos.getColumnModel().getColumn(4));
+
             } catch (JDOMException ex) {
                 Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
             } catch (IOException ex) {
@@ -86,23 +91,16 @@ public class modal_ofertas extends javax.swing.JFrame {
             }
 
         } else {
-            lbl_mensaje.setText("No se encontraron ofertas creadas para esta tienda");
+            lbl_mensaje.setText("No se encontraron productos");
             pnl_info.setVisible(true);
         }
 
     }
 
-    public modal_ofertas() {
-        initComponents();
-        pnl_info.setVisible(false);
-        cargarTablaOfertas(1);
-
-    }
-
-    public static modal_ofertas getObj(crear_oferta f) {
+    public static modal_productos getObj(crear_oferta f) {
         first = f;
         if (obj == null) {
-            obj = new modal_ofertas();
+            obj = new modal_productos();
         }
         return obj;
     }
@@ -118,14 +116,18 @@ public class modal_ofertas extends javax.swing.JFrame {
 
         jPanel1 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        tbl_ofertas = new javax.swing.JTable();
+        tbl_productos = new javax.swing.JTable();
         btn_seleccionar = new javax.swing.JButton();
         btn_cancelar = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         pnl_info = new javax.swing.JPanel();
         lbl_mensaje = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        jComboBox1 = new javax.swing.JComboBox<>();
 
-        tbl_ofertas.setModel(new javax.swing.table.DefaultTableModel(
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+
+        tbl_productos.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -136,12 +138,7 @@ public class modal_ofertas extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        tbl_ofertas.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mousePressed(java.awt.event.MouseEvent evt) {
-                tbl_ofertasMousePressed(evt);
-            }
-        });
-        jScrollPane1.setViewportView(tbl_ofertas);
+        jScrollPane1.setViewportView(tbl_productos);
 
         btn_seleccionar.setText("Seleccionar");
         btn_seleccionar.addActionListener(new java.awt.event.ActionListener() {
@@ -151,14 +148,9 @@ public class modal_ofertas extends javax.swing.JFrame {
         });
 
         btn_cancelar.setText("Cancelar");
-        btn_cancelar.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btn_cancelarActionPerformed(evt);
-            }
-        });
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
-        jLabel1.setText("Seleccione una Oferta");
+        jLabel1.setText("Seleccione un producto");
 
         lbl_mensaje.setText("[label mensaje]");
 
@@ -178,33 +170,50 @@ public class modal_ofertas extends javax.swing.JFrame {
                 .addComponent(lbl_mensaje))
         );
 
+        jLabel2.setText("Categoria");
+
+        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(10, 10, 10)
-                        .addComponent(btn_cancelar)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btn_seleccionar))
+                        .addContainerGap()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGap(10, 10, 10)
+                                .addComponent(btn_cancelar)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(btn_seleccionar))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(pnl_info, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 471, Short.MAX_VALUE)))
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(pnl_info, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 498, Short.MAX_VALUE))
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGap(153, 153, 153)
+                                .addComponent(jLabel1))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jLabel2)
+                                .addGap(33, 33, 33)
+                                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(153, 153, 153)
-                .addComponent(jLabel1)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 42, Short.MAX_VALUE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel2)
+                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(26, 26, 26)
                 .addComponent(pnl_info, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -235,37 +244,30 @@ public class modal_ofertas extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btn_cancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_cancelarActionPerformed
-        obj = null;
-        this.dispose();
-    }//GEN-LAST:event_btn_cancelarActionPerformed
-
-    private void tbl_ofertasMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbl_ofertasMousePressed
-        if (evt.getButton() == MouseEvent.BUTTON1 && evt.getClickCount() == 2) {
-
-        }
-    }//GEN-LAST:event_tbl_ofertasMousePressed
-
     private void btn_seleccionarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_seleccionarActionPerformed
 
-        String data1 = tbl_ofertas.getValueAt(tbl_ofertas.getSelectedRow(), 0).toString();
-        String data2 = tbl_ofertas.getValueAt(tbl_ofertas.getSelectedRow(), 1).toString();
-        if (data1.trim().equals("")) {
-            JOptionPane.showMessageDialog(null, "Seleccione una oferta");
+        String auxId = tbl_productos.getValueAt(tbl_productos.getSelectedRow(), 0).toString();
 
+        if (auxId.trim().equals("")) {
+            JOptionPane.showMessageDialog(null, "Seleccione un Producto");
         } else {
-            /*prueba de campos ocultos */
-             JOptionPane.showMessageDialog(null, tbl_ofertas.getModel().getValueAt(tbl_ofertas.getSelectedRow(),4));
-             JOptionPane.showMessageDialog(null, tbl_ofertas.getModel().getValueAt(tbl_ofertas.getSelectedRow(),5));
-             JOptionPane.showMessageDialog(null, tbl_ofertas.getModel().getValueAt(tbl_ofertas.getSelectedRow(),6));
-             
-            Oferta oft = new Oferta();
-            oft.setId(Integer.parseInt(data1));
-            oft.setTienda(data2);
+            Integer id = Integer.parseInt(auxId);
+            String cod_barra = tbl_productos.getValueAt(tbl_productos.getSelectedRow(), 1).toString();
+            String descripcion = tbl_productos.getModel().getValueAt(tbl_productos.getSelectedRow(), 2).toString();
+            String auxPrecioVenta = tbl_productos.getModel().getValueAt(tbl_productos.getSelectedRow(), 3).toString();
 
-            first.cargar_oferta(oft);
+            Integer precioVenta = Integer.parseInt(auxPrecioVenta);
+
+            Producto pro = new Producto();
+            pro.setId(id);
+            pro.setCodBarra(cod_barra);
+            pro.setDescripcion(descripcion);
+            pro.setPrecioVenta(precioVenta);
+
+            first.agregar_producto(pro);
             obj = null;
             this.dispose();
+
         }
 
     }//GEN-LAST:event_btn_seleccionarActionPerformed
@@ -287,20 +289,20 @@ public class modal_ofertas extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(modal_ofertas.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(modal_productos.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(modal_ofertas.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(modal_productos.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(modal_ofertas.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(modal_productos.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(modal_ofertas.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(modal_productos.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new modal_ofertas().setVisible(true);
+                new modal_productos().setVisible(true);
             }
         });
     }
@@ -308,11 +310,13 @@ public class modal_ofertas extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btn_cancelar;
     private javax.swing.JButton btn_seleccionar;
+    private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lbl_mensaje;
     private javax.swing.JPanel pnl_info;
-    private javax.swing.JTable tbl_ofertas;
+    private javax.swing.JTable tbl_productos;
     // End of variables declaration//GEN-END:variables
 }
