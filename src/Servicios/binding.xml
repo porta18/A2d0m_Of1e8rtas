@@ -1,0 +1,66 @@
+<wsdl:binding name="BasicHttpBinding_IMantenedores" type="tns:IMantenedores">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="DoWork">
+        <soap:operation soapAction="http://tempuri.org/IMantenedores/DoWork" style="document"/>
+        <wsdl:input>
+            <soap:body use="literal"/>
+        </wsdl:input>
+        <wsdl:output>
+            <soap:body use="literal"/>
+        </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UpdateUserPass">
+        <soap:operation soapAction="http://tempuri.org/IMantenedores/UpdateUserPass" style="document"/>
+        <wsdl:input>
+            <soap:body use="literal"/>
+        </wsdl:input>
+        <wsdl:output>
+            <soap:body use="literal"/>
+        </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="InsertPers">
+        <soap:operation soapAction="http://tempuri.org/IMantenedores/InsertPers" style="document"/>
+        <wsdl:input>
+            <soap:body use="literal"/>
+        </wsdl:input>
+        <wsdl:output>
+            <soap:body use="literal"/>
+        </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="CreaUser">
+        <soap:operation soapAction="http://tempuri.org/IMantenedores/CreaUser" style="document"/>
+        <wsdl:input>
+            <soap:body use="literal"/>
+        </wsdl:input>
+        <wsdl:output>
+            <soap:body use="literal"/>
+        </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="CrearTienda">
+        <soap:operation soapAction="http://tempuri.org/IMantenedores/CrearTienda" style="document"/>
+        <wsdl:input>
+            <soap:body use="literal"/>
+        </wsdl:input>
+        <wsdl:output>
+            <soap:body use="literal"/>
+        </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="CrearOferta">
+        <soap:operation soapAction="http://tempuri.org/IMantenedores/CrearOferta" style="document"/>
+        <wsdl:input>
+            <soap:body use="literal"/>
+        </wsdl:input>
+        <wsdl:output>
+            <soap:body use="literal"/>
+        </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GuardarOferta">
+        <soap:operation soapAction="http://tempuri.org/IMantenedores/GuardarOferta" style="document"/>
+        <wsdl:input>
+            <soap:body use="literal"/>
+        </wsdl:input>
+        <wsdl:output>
+            <soap:body use="literal"/>
+        </wsdl:output>
+    </wsdl:operation>
+</wsdl:binding>

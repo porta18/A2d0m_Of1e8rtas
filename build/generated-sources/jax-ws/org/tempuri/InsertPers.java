@@ -26,7 +26,6 @@ import javax.xml.datatype.XMLGregorianCalendar;
  *         &lt;element name="pAp" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *         &lt;element name="pAm" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *         &lt;element name="pFechaN" type="{http://www.w3.org/2001/XMLSchema}dateTime" minOccurs="0"/>
- *         &lt;element name="pVigencia" type="{http://schemas.microsoft.com/2003/10/Serialization/}char" minOccurs="0"/>
  *         &lt;element name="pSexo" type="{http://www.w3.org/2001/XMLSchema}int" minOccurs="0"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
@@ -43,7 +42,6 @@ import javax.xml.datatype.XMLGregorianCalendar;
     "pAp",
     "pAm",
     "pFechaN",
-    "pVigencia",
     "pSexo"
 })
 @XmlRootElement(name = "InsertPers")
@@ -58,7 +56,6 @@ public class InsertPers {
     protected JAXBElement<String> pAm;
     @XmlSchemaType(name = "dateTime")
     protected XMLGregorianCalendar pFechaN;
-    protected Integer pVigencia;
     protected Integer pSexo;
 
     /**
@@ -179,30 +176,6 @@ public class InsertPers {
      */
     public void setPFechaN(XMLGregorianCalendar value) {
         this.pFechaN = value;
-    }
-
-    /**
-     * Obtiene el valor de la propiedad pVigencia.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Integer }
-     *     
-     */
-    public Integer getPVigencia() {
-        return pVigencia;
-    }
-
-    /**
-     * Define el valor de la propiedad pVigencia.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Integer }
-     *     
-     */
-    public void setPVigencia(Integer value) {
-        this.pVigencia = value;
     }
 
     /**

@@ -5,7 +5,21 @@
  */
 package Vista.modal;
 
+import Servicios.WsOferta;
+import Servicios.WsTienda;
+import Vista.Login;
 import Vista.adm_tiendas;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.ListSelectionModel;
+import javax.swing.table.DefaultTableModel;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.input.SAXBuilder;
 
 /**
  *
@@ -20,6 +34,8 @@ public class modal_tiendas extends javax.swing.JFrame {
     private static modal_tiendas obj = null;
     public modal_tiendas() {
         initComponents();
+         tbl_tiendas.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+         cargarTablaTiendas(0);
     }
     
     public static modal_tiendas getObj(adm_tiendas f) {
@@ -29,6 +45,60 @@ public class modal_tiendas extends javax.swing.JFrame {
         }
         return obj;
     }
+    
+    public void cargarTablaTiendas(Integer tnd_id) {
+
+        WsTienda ws = new WsTienda();
+        String retorno = "";
+        retorno = ws.WSfn_TraerTienda(tnd_id);
+
+        if (!retorno.equals("<NewDataSet />")) {
+            try {
+                SAXBuilder builder = new SAXBuilder();
+
+                InputStream stream = new ByteArrayInputStream(retorno.getBytes("UTF-8"));
+                Document document = builder.build(stream);
+
+                //Document document = (Document) builder.build(retorno);
+                Element rootNode = document.getRootElement();
+                java.util.List<Element> list = rootNode.getChildren("Table");
+
+                String encabezadoTabla[] = {"ID", "Nombre", "Direccion", "Comuna id"};
+                DefaultTableModel tableModel = new DefaultTableModel(encabezadoTabla, 0);
+
+                for (int i = 0; i < list.size(); i++) {
+
+                    Element node = (Element) list.get(i);
+
+                    String id = node.getChildText("TND_ID");
+                    String nombre = node.getChildText("TND_DESCRIPCION");
+                    String direccion = node.getChildText("TND_DIRECCION");
+                    String comunaId = node.getChildText("COMUNA_CMN_ID");
+      
+
+                    Object[] objs = {id, nombre, direccion, comunaId};
+                    tableModel.addRow(objs);
+                }
+                tbl_tiendas.setModel(tableModel);
+                /*bloqueo la tabla para no ser editada*/
+                tbl_tiendas.setDefaultEditor(Object.class, null);
+
+                tbl_tiendas.removeColumn(tbl_tiendas.getColumnModel().getColumn(3));
+               
+
+            } catch (JDOMException ex) {
+                Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+        } else {
+            lbl_mensaje.setText("No se encontraron tiendas");
+            pnl_info.setVisible(true);
+        }
+
+    }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -41,7 +111,7 @@ public class modal_tiendas extends javax.swing.JFrame {
 
         jPanel1 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        tbl_productos = new javax.swing.JTable();
+        tbl_tiendas = new javax.swing.JTable();
         btn_seleccionar = new javax.swing.JButton();
         btn_cancelar = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
@@ -49,8 +119,9 @@ public class modal_tiendas extends javax.swing.JFrame {
         lbl_mensaje = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setAlwaysOnTop(true);
 
-        tbl_productos.setModel(new javax.swing.table.DefaultTableModel(
+        tbl_tiendas.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -61,7 +132,7 @@ public class modal_tiendas extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        jScrollPane1.setViewportView(tbl_productos);
+        jScrollPane1.setViewportView(tbl_tiendas);
 
         btn_seleccionar.setText("Seleccionar");
 
@@ -189,6 +260,6 @@ public class modal_tiendas extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lbl_mensaje;
     private javax.swing.JPanel pnl_info;
-    private javax.swing.JTable tbl_productos;
+    private javax.swing.JTable tbl_tiendas;
     // End of variables declaration//GEN-END:variables
 }

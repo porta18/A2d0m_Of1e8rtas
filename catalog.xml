@@ -8,4 +8,12 @@
     <system systemId="http://localhost/WCF_Portafolio/Service.svc?xsd=xsd1" uri="xml-resources/web-service-references/Service/wsdl/localhost/WCF_Portafolio/Service.svc.xsd_xsd1.xsd"/>
     <system systemId="http://localhost/WCF_Portafolio/Service.svc?xsd=xsd2" uri="xml-resources/web-service-references/Service/wsdl/localhost/WCF_Portafolio/Service.svc.xsd_xsd2.xsd"/>
     <system systemId="http://fvsoluciones-001-site1.ftempurl.com/Service1.svc?singleWsdl" uri="xml-resources/web-service-references/Service1/wsdl/fvsoluciones-001-site1.ftempurl.com/Service1.svc.singlewsdl.wsdl"/>
+    <system systemId="file:/C:/Users/Sony/Dropbox/A2d0m_Of1e8rtas/src/Servicios/binding.xml" uri="xml-resources/jaxb/binding2/binding.xml"/>
+    <system systemId="http://fvsoluciones-001-site4.ftempurl.com/Mantenedores.svc?wsdl" uri="xml-resources/jaxb/Mantenedores/fvsoluciones-001-site4.ftempurl.com/Mantenedores.svc.wsdl"/>
+    <system systemId="http://fvsoluciones-001-site4.ftempurl.com/Mantenedores.svc?xsd=xsd0" uri="xml-resources/jaxb/Mantenedores/fvsoluciones-001-site4.ftempurl.com/Mantenedores.svc.xsd_xsd0.xsd"/>
+    <system systemId="http://fvsoluciones-001-site4.ftempurl.com/Mantenedores.svc?xsd=xsd1" uri="xml-resources/jaxb/Mantenedores/fvsoluciones-001-site4.ftempurl.com/Mantenedores.svc.xsd_xsd1.xsd"/>
+    <system systemId="http://www.webservicex.net/periodictable.asmx?WSDL" uri="xml-resources/web-service-references/periodictable/wsdl/www.webservicex.net/periodictable.asmx.wsdl"/>
+    <system systemId="http://fvsoluciones-001-site4.ftempurl.com/Consultas.svc?wsdl" uri="xml-resources/web-service-references/Consultas/wsdl/fvsoluciones-001-site4.ftempurl.com/Consultas.svc.wsdl"/>
+    <system systemId="http://fvsoluciones-001-site4.ftempurl.com/Consultas.svc?xsd=xsd0" uri="xml-resources/web-service-references/Consultas/wsdl/fvsoluciones-001-site4.ftempurl.com/Consultas.svc.xsd_xsd0.xsd"/>
+    <system systemId="http://fvsoluciones-001-site4.ftempurl.com/Consultas.svc?xsd=xsd1" uri="xml-resources/web-service-references/Consultas/wsdl/fvsoluciones-001-site4.ftempurl.com/Consultas.svc.xsd_xsd1.xsd"/>
 </catalog>

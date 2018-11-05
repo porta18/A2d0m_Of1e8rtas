@@ -8,6 +8,7 @@ package Vista;
 import Clases.Usuario;
 import Clases.UsuarioSesion;
 import javax.swing.JFrame;
+import javax.swing.JMenuItem;
 
 /**
  *
@@ -23,15 +24,46 @@ public class Home extends javax.swing.JFrame {
         initComponents();
 
         this.setExtendedState(JFrame.MAXIMIZED_BOTH);
-        
+
         Usuario usu = UsuarioSesion.UsuSesion;
 
-        lblNombreLoad.setText(usu.getNombre());
-
-
-      
+        String nombre = usu.getPersona().getNombres().trim() + ' '
+                + usu.getPersona().getApellido_p().trim() + ' '
+                + usu.getPersona().getApellido_m().trim();
+        lblNombreLoad.setText(nombre);
         lblCargoLoad.setText(usu.getDescripcion_tipo_usuario());
-         
+        cotrol_vista();
+    }
+
+    public void cotrol_vista() {
+        Usuario usu = UsuarioSesion.UsuSesion;
+
+        int perfil;
+        perfil = usu.getTipo_usuario();
+        switch (perfil) {
+            case 1: //encargado de tienda
+                mi_adm_ofertas.setEnabled(true);
+                mi_notificar_oferta.setEnabled(true);
+                break;
+            case 2: //administrador
+                mi_tiendas.setEnabled(true);
+                mi_usuarios.setEnabled(true);
+                mi_productos.setEnabled(true);
+                mi_descuentos.setEnabled(true);
+                break;
+            case 3: //Gerente  
+                mi_resumen_tienda.setEnabled(true);
+                break;
+            default:
+                mi_descuentos.setEnabled(true);
+                mi_notificar_oferta.setEnabled(true);
+                mi_productos.setEnabled(true);
+                mi_adm_ofertas.setEnabled(true);
+                mi_tiendas.setEnabled(true);
+                mi_usuarios.setEnabled(true);
+                mi_valoracion_ofertas.setEnabled(true);
+                mi_resumen_tienda.setEnabled(true);
+        }
     }
 
     /**
@@ -57,17 +89,18 @@ public class Home extends javax.swing.JFrame {
         lblCargoTitulo = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
+        mi_cerrar_sesion = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
         mi_usuarios = new javax.swing.JMenuItem();
         mi_tiendas = new javax.swing.JMenuItem();
-        jMenuItem3 = new javax.swing.JMenuItem();
-        jMenuItem4 = new javax.swing.JMenuItem();
+        mi_productos = new javax.swing.JMenuItem();
+        mi_descuentos = new javax.swing.JMenuItem();
         mi_adm_ofertas = new javax.swing.JMenuItem();
         jMenu5 = new javax.swing.JMenu();
         mi_valoracion_ofertas = new javax.swing.JMenuItem();
-        jMenuItem8 = new javax.swing.JMenuItem();
+        mi_resumen_tienda = new javax.swing.JMenuItem();
         jMenu8 = new javax.swing.JMenu();
-        mi_administrar_oferta = new javax.swing.JMenuItem();
+        mi_notificar_oferta = new javax.swing.JMenuItem();
         jMenuItem6 = new javax.swing.JMenuItem();
 
         jMenu3.setText("File");
@@ -128,12 +161,12 @@ public class Home extends javax.swing.JFrame {
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addComponent(lblNombreTitulo)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(lblNombreLoad, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(lblNombreLoad, javax.swing.GroupLayout.PREFERRED_SIZE, 298, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addComponent(lblCargoTitulo)
                         .addGap(23, 23, 23)
-                        .addComponent(lblCargoLoad, javax.swing.GroupLayout.PREFERRED_SIZE, 469, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(lblCargoLoad, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addContainerGap(13, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -150,14 +183,30 @@ public class Home extends javax.swing.JFrame {
         );
 
         jMenu1.setText("Archivo");
+
+        mi_cerrar_sesion.setText("Cerrar Sesion");
+        mi_cerrar_sesion.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mi_cerrar_sesionActionPerformed(evt);
+            }
+        });
+        jMenu1.add(mi_cerrar_sesion);
+
         jMenuBar1.add(jMenu1);
 
         jMenu2.setText("Administrar");
 
         mi_usuarios.setText("Usuarios");
+        mi_usuarios.setEnabled(false);
+        mi_usuarios.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mi_usuariosActionPerformed(evt);
+            }
+        });
         jMenu2.add(mi_usuarios);
 
         mi_tiendas.setText("Tiendas");
+        mi_tiendas.setEnabled(false);
         mi_tiendas.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 mi_tiendasActionPerformed(evt);
@@ -165,13 +214,16 @@ public class Home extends javax.swing.JFrame {
         });
         jMenu2.add(mi_tiendas);
 
-        jMenuItem3.setText("Productos");
-        jMenu2.add(jMenuItem3);
+        mi_productos.setText("Productos");
+        mi_productos.setEnabled(false);
+        jMenu2.add(mi_productos);
 
-        jMenuItem4.setText("Descuentos");
-        jMenu2.add(jMenuItem4);
+        mi_descuentos.setText("Descuentos");
+        mi_descuentos.setEnabled(false);
+        jMenu2.add(mi_descuentos);
 
         mi_adm_ofertas.setText("Ofertas");
+        mi_adm_ofertas.setEnabled(false);
         mi_adm_ofertas.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 mi_adm_ofertasActionPerformed(evt);
@@ -184,6 +236,7 @@ public class Home extends javax.swing.JFrame {
         jMenu5.setText("Reportes");
 
         mi_valoracion_ofertas.setText("Valoracion Ofertas");
+        mi_valoracion_ofertas.setEnabled(false);
         mi_valoracion_ofertas.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 mi_valoracion_ofertasActionPerformed(evt);
@@ -191,15 +244,17 @@ public class Home extends javax.swing.JFrame {
         });
         jMenu5.add(mi_valoracion_ofertas);
 
-        jMenuItem8.setText("Resumen por Tienda");
-        jMenu5.add(jMenuItem8);
+        mi_resumen_tienda.setText("Resumen por Tienda");
+        mi_resumen_tienda.setEnabled(false);
+        jMenu5.add(mi_resumen_tienda);
 
         jMenuBar1.add(jMenu5);
 
         jMenu8.setText("Ofertas");
 
-        mi_administrar_oferta.setText("Publicar");
-        jMenu8.add(mi_administrar_oferta);
+        mi_notificar_oferta.setText("Notificar Ofertas Consumidor");
+        mi_notificar_oferta.setEnabled(false);
+        jMenu8.add(mi_notificar_oferta);
 
         jMenuItem6.setText("jMenuItem6");
         jMenu8.add(jMenuItem6);
@@ -215,7 +270,7 @@ public class Home extends javax.swing.JFrame {
             .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 292, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -242,6 +297,16 @@ public class Home extends javax.swing.JFrame {
     private void mi_valoracion_ofertasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mi_valoracion_ofertasActionPerformed
 
     }//GEN-LAST:event_mi_valoracion_ofertasActionPerformed
+
+    private void mi_usuariosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mi_usuariosActionPerformed
+         adm_usuarios.getObj().setVisible(true);
+    }//GEN-LAST:event_mi_usuariosActionPerformed
+
+    private void mi_cerrar_sesionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mi_cerrar_sesionActionPerformed
+        Login lg = new Login();
+        lg.setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_mi_cerrar_sesionActionPerformed
 
     /**
      * @param args the command line arguments
@@ -290,10 +355,7 @@ public class Home extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu8;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuBar jMenuBar2;
-    private javax.swing.JMenuItem jMenuItem3;
-    private javax.swing.JMenuItem jMenuItem4;
     private javax.swing.JMenuItem jMenuItem6;
-    private javax.swing.JMenuItem jMenuItem8;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JLabel lblCargoLoad;
@@ -301,7 +363,11 @@ public class Home extends javax.swing.JFrame {
     private javax.swing.JLabel lblNombreLoad;
     private javax.swing.JLabel lblNombreTitulo;
     private javax.swing.JMenuItem mi_adm_ofertas;
-    private javax.swing.JMenuItem mi_administrar_oferta;
+    private javax.swing.JMenuItem mi_cerrar_sesion;
+    private javax.swing.JMenuItem mi_descuentos;
+    private javax.swing.JMenuItem mi_notificar_oferta;
+    private javax.swing.JMenuItem mi_productos;
+    private javax.swing.JMenuItem mi_resumen_tienda;
     private javax.swing.JMenuItem mi_tiendas;
     private javax.swing.JMenuItem mi_usuarios;
     private javax.swing.JMenuItem mi_valoracion_ofertas;

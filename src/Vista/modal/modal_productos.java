@@ -6,6 +6,8 @@
 package Vista.modal;
 
 import Clases.Producto;
+import Clases.Usuario;
+import Clases.UsuarioSesion;
 import Servicios.WsProducto;
 import Vista.Login;
 import Vista.crear_oferta;
@@ -19,6 +21,7 @@ import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -39,8 +42,12 @@ public class modal_productos extends javax.swing.JFrame {
      */
     public modal_productos() {
         initComponents();
+        tbl_productos.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         pnl_info.setVisible(false);
-        cargarTablaOfertas(1);
+
+        Usuario usu = UsuarioSesion.UsuSesion;
+        int tienda_id = usu.getTienda_id();
+        cargarTablaOfertas(tienda_id);
     }
 
     public void cargarTablaOfertas(Integer tnd_id) {
@@ -126,6 +133,7 @@ public class modal_productos extends javax.swing.JFrame {
         jComboBox1 = new javax.swing.JComboBox<>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setAlwaysOnTop(true);
 
         tbl_productos.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -249,7 +257,7 @@ public class modal_productos extends javax.swing.JFrame {
         String auxId = tbl_productos.getValueAt(tbl_productos.getSelectedRow(), 0).toString();
 
         if (auxId.trim().equals("")) {
-            JOptionPane.showMessageDialog(null, "Seleccione un Producto");
+            JOptionPane.showMessageDialog(this, "Seleccione un Producto");
         } else {
             Integer id = Integer.parseInt(auxId);
             String cod_barra = tbl_productos.getValueAt(tbl_productos.getSelectedRow(), 1).toString();

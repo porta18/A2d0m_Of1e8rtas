@@ -9,7 +9,7 @@ import Vista.modal.modal_tiendas;
 import java.awt.event.ItemEvent;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
-import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
+//import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 
 /**
  *
@@ -21,14 +21,15 @@ public class adm_tiendas extends javax.swing.JFrame {
 
     public adm_tiendas() {
         initComponents();
+        this.setLocationRelativeTo(null);
         pnl_detalle.setVisible(false);
 
-        AutoCompleteDecorator.decorate(cbo_comuna);
+        //AutoCompleteDecorator.decorate(cbo_comuna);
         cbo_comuna.addItem("uno");
         cbo_comuna.addItem("dos");
         cbo_comuna.addItem("tres");
 
-        AutoCompleteDecorator.decorate(cbo_comuna_hide);
+        //AutoCompleteDecorator.decorate(cbo_comuna_hide);
         cbo_comuna_hide.addItem("Visible: String :1");
         cbo_comuna_hide.addItem("Visible: String :2");
         cbo_comuna_hide.addItem("Visible: String :3");
@@ -78,6 +79,7 @@ public class adm_tiendas extends javax.swing.JFrame {
         cbo_comuna_hide = new javax.swing.JComboBox<>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setAlwaysOnTop(true);
 
         btn_nuevo.setText("Nuevo");
         btn_nuevo.addActionListener(new java.awt.event.ActionListener() {

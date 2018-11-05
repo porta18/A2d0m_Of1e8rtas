@@ -19,8 +19,8 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element name="pNombre" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
- *         &lt;element name="pPassword" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="pUsuario" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="pClave" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -31,63 +31,63 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "pNombre",
-    "pPassword"
+    "pUsuario",
+    "pClave"
 })
 @XmlRootElement(name = "LoginUsuario")
 public class LoginUsuario {
 
-    @XmlElementRef(name = "pNombre", namespace = "http://tempuri.org/", type = JAXBElement.class, required = false)
-    protected JAXBElement<String> pNombre;
-    @XmlElementRef(name = "pPassword", namespace = "http://tempuri.org/", type = JAXBElement.class, required = false)
-    protected JAXBElement<String> pPassword;
+    @XmlElementRef(name = "pUsuario", namespace = "http://tempuri.org/", type = JAXBElement.class, required = false)
+    protected JAXBElement<String> pUsuario;
+    @XmlElementRef(name = "pClave", namespace = "http://tempuri.org/", type = JAXBElement.class, required = false)
+    protected JAXBElement<String> pClave;
 
     /**
-     * Obtiene el valor de la propiedad pNombre.
+     * Obtiene el valor de la propiedad pUsuario.
      * 
      * @return
      *     possible object is
      *     {@link JAXBElement }{@code <}{@link String }{@code >}
      *     
      */
-    public JAXBElement<String> getPNombre() {
-        return pNombre;
+    public JAXBElement<String> getPUsuario() {
+        return pUsuario;
     }
 
     /**
-     * Define el valor de la propiedad pNombre.
+     * Define el valor de la propiedad pUsuario.
      * 
      * @param value
      *     allowed object is
      *     {@link JAXBElement }{@code <}{@link String }{@code >}
      *     
      */
-    public void setPNombre(JAXBElement<String> value) {
-        this.pNombre = value;
+    public void setPUsuario(JAXBElement<String> value) {
+        this.pUsuario = value;
     }
 
     /**
-     * Obtiene el valor de la propiedad pPassword.
+     * Obtiene el valor de la propiedad pClave.
      * 
      * @return
      *     possible object is
      *     {@link JAXBElement }{@code <}{@link String }{@code >}
      *     
      */
-    public JAXBElement<String> getPPassword() {
-        return pPassword;
+    public JAXBElement<String> getPClave() {
+        return pClave;
     }
 
     /**
-     * Define el valor de la propiedad pPassword.
+     * Define el valor de la propiedad pClave.
      * 
      * @param value
      *     allowed object is
      *     {@link JAXBElement }{@code <}{@link String }{@code >}
      *     
      */
-    public void setPPassword(JAXBElement<String> value) {
-        this.pPassword = value;
+    public void setPClave(JAXBElement<String> value) {
+        this.pClave = value;
     }
 
 }
