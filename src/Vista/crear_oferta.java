@@ -9,7 +9,12 @@ import Vista.modal.modal_productos;
 import Vista.modal.modal_ofertas;
 import Clases.Oferta;
 import Clases.Producto;
+import Clases.Usuario;
+import Clases.UsuarioSesion;
 import Servicios.WsOferta;
+import Servicios.WsTienda;
+import java.awt.event.ItemEvent;
+import java.awt.event.KeyEvent;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,9 +23,11 @@ import java.text.SimpleDateFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
-
 import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
+
+//import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -32,21 +39,112 @@ import org.jdom2.input.SAXBuilder;
  */
 public class crear_oferta extends javax.swing.JFrame {
 
-    public String encabezadoTablaP[] = {"ID", "Cod Barra", "Descripcion", "Precio venta", "Precio Oferta"};
+    public String encabezadoTablaP[] = {"ID", "Cod Barra", "Descripcion", "Precio venta", "Precio Oferta","id"};
     public DefaultTableModel tableModelP = new DefaultTableModel(encabezadoTablaP, 0);
 
     private static crear_oferta obj = null;
+    private static Home first = null;
+
+    private int tienda_id;
 
     public crear_oferta() {
         initComponents();
+      
+        tbl_productos.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        this.setLocationRelativeTo(null);
         pnl_detalle.setVisible(false);
 
+        Usuario usu = UsuarioSesion.UsuSesion;
+        this.tienda_id = usu.getTienda_id();
+
+        cargarTipoOferta(0);
+        cargarTiendas(this.tienda_id);
+
+        cmb_tienda_hide.setVisible(false);
+        cmb_tipo_oferta_hide.setVisible(false);
         tableModelP.setRowCount(0);
 
-        AutoCompleteDecorator.decorate(cbo_tipo_oferta);
-        cbo_tipo_oferta.addItem("Visible String 1");
-        cbo_tipo_oferta.addItem("Visible String 2");
-        cbo_tipo_oferta.addItem("Visible String 3");
+    }
+
+    public void cargarTipoOferta(Integer tnd_id) {
+
+        WsOferta ws = new WsOferta();
+        String retorno = "";
+        retorno = ws.WSfn_TraerTipoOferta(tnd_id);
+
+        if (!retorno.equals("<NewDataSet />")) {
+            try {
+                SAXBuilder builder = new SAXBuilder();
+
+                InputStream stream = new ByteArrayInputStream(retorno.getBytes("UTF-8"));
+                Document document = builder.build(stream);
+
+                //Document document = (Document) builder.build(retorno);
+                Element rootNode = document.getRootElement();
+                java.util.List<Element> list = rootNode.getChildren("Table");
+
+                for (int i = 0; i < list.size(); i++) {
+
+                    Element node = (Element) list.get(i);
+
+                    String id = node.getChildText("T_OFT_ID");
+                    String descripcion = node.getChildText("T_OFT_DESCRIPCION");
+                    String compra_min = node.getChildText("T_OFT_COMPRA_MIN");
+                    String compra_max = node.getChildText("T_OFT_COMPRA_MAX");
+
+                    //AutoCompleteDecorator.decorate(cmb_tipo_oferta);
+                    cmb_tipo_oferta.addItem(descripcion);
+                    cmb_tipo_oferta_hide.addItem(id + ':' + descripcion + ':' + compra_min + ':' + compra_max);
+
+                }
+
+            } catch (JDOMException ex) {
+                Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+        }
+
+    }
+
+    public void cargarTiendas(Integer tnd_id) {
+
+        WsTienda ws = new WsTienda();
+        String retorno = "";
+        retorno = ws.WSfn_TraerTienda(tnd_id);
+
+        if (!retorno.equals("<NewDataSet />")) {
+            try {
+                SAXBuilder builder = new SAXBuilder();
+
+                InputStream stream = new ByteArrayInputStream(retorno.getBytes("UTF-8"));
+                Document document = builder.build(stream);
+
+                //Document document = (Document) builder.build(retorno);
+                Element rootNode = document.getRootElement();
+                java.util.List<Element> list = rootNode.getChildren("Table");
+
+                for (int i = 0; i < list.size(); i++) {
+
+                    Element node = (Element) list.get(i);
+
+                    String id = node.getChildText("TND_ID");
+                    String descripcion = node.getChildText("TND_DESCRIPCION");
+
+                    cmb_tienda.addItem(descripcion);
+                    cmb_tienda_hide.addItem(id + ':' + descripcion);
+
+                }
+
+            } catch (JDOMException ex) {
+                Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+        }
+
     }
 
     public void cargar_tabla(Integer oft_id) {
@@ -67,8 +165,8 @@ public class crear_oferta extends javax.swing.JFrame {
                 java.util.List<Element> list = rootNode.getChildren("Table");
 
                 String encabezadoTabla[] = {"ID", "Cod Barra", "Descripcion", "Precio venta", "Precio Oferta", "Detalle ID"};
-                DefaultTableModel tableModel = new DefaultTableModel(encabezadoTabla, 0);
-                tableModel.setRowCount(0);
+                tableModelP = new DefaultTableModel(encabezadoTabla, 0);
+                tableModelP.setRowCount(0);
 
                 for (int i = 0; i < list.size(); i++) {
 
@@ -82,9 +180,9 @@ public class crear_oferta extends javax.swing.JFrame {
                     String detalleId = node.getChildText("DTO_ID");
 
                     Object[] objs = {prd_id, cod_barra, descripcion, pVenta, pOferta, detalleId};
-                    tableModel.addRow(objs);
+                    tableModelP.addRow(objs);
                 }
-                tbl_productos.setModel(tableModel);
+                tbl_productos.setModel(tableModelP);
                 /*bloqueo la tabla para no ser editada*/
                 tbl_productos.setDefaultEditor(Object.class, null);
 
@@ -105,7 +203,8 @@ public class crear_oferta extends javax.swing.JFrame {
 
     }
 
-    public static crear_oferta getObj() {
+    public static crear_oferta getObj(Home f) {
+        first = f;
         if (obj == null) {
             obj = new crear_oferta();
         }
@@ -114,7 +213,6 @@ public class crear_oferta extends javax.swing.JFrame {
 
     public void cargar_oferta(Oferta oft) {
         pnl_detalle.setVisible(true);
-        pnl_detalle.setVisible(true);
         if (oft.getPublica() == 1) {
             chk_publicar.setSelected(true);
         }
@@ -122,10 +220,26 @@ public class crear_oferta extends javax.swing.JFrame {
         Format formatter = new SimpleDateFormat("dd-MM-YYYY");
         String sFechaIni = formatter.format(oft.getFechaInicio());
         String sFechaFin = formatter.format(oft.getFechaTermino());
+        Integer idOferta = oft.getId();
+
+        Integer tipoOferta = oft.getTipoOferta();
+
+        int size = cmb_tipo_oferta_hide.getItemCount();
+        for (int i = 0; i < size; i++) {
+            String item = cmb_tipo_oferta_hide.getItemAt(i);
+            String[] parts = item.split(":");
+            int id = Integer.parseInt(parts[0]);
+            if (id == tipoOferta) {
+                cmb_tipo_oferta_hide.setSelectedIndex(i);
+                cmb_tipo_oferta.setSelectedIndex(i);
+                i = size;
+            }
+        }
 
         txt_desde.setText(sFechaIni);
         txt_hasta.setText(sFechaFin);
-        cargar_tabla(oft.getId());
+        cargar_tabla(idOferta);
+        lbl_oferta.setText(idOferta.toString());
 
     }
 
@@ -136,14 +250,28 @@ public class crear_oferta extends javax.swing.JFrame {
         String cod_barra = pro.getCodBarra();
         String descripcion = pro.getDescripcion();
         Integer pOferta = 0;
+        String tipo_oferta = cmb_tipo_oferta.getSelectedItem().toString();
 
-        Object[] objs = {id, cod_barra, descripcion, pVenta, pOferta};
+        if (tipo_oferta.contains("%")) {
+            String[] parts = tipo_oferta.split("%");
+            int porcentaje = Integer.parseInt(parts[0]);
+            pOferta = (pVenta - (pVenta * porcentaje / 100));
+        } else {
+            if (tipo_oferta.contains("x")) {
+                String[] parts = tipo_oferta.split("x");
+                int divisor = Integer.parseInt(parts[0]);
+                pOferta = (pVenta / divisor);
+            }
+        }
+
+        Object[] objs = {id, cod_barra, descripcion, pVenta, pOferta, -1};
         tableModelP.addRow(objs);
 
         tbl_productos.setModel(tableModelP);
         /*bloqueo la tabla para no ser editada*/
         tbl_productos.setDefaultEditor(Object.class, null);
-
+        
+        tbl_productos.removeColumn(tbl_productos.getColumnModel().getColumn(5));
     }
 
     public void limpiar_form() {
@@ -176,10 +304,10 @@ public class crear_oferta extends javax.swing.JFrame {
         pnl_detalle = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tbl_productos = new javax.swing.JTable();
-        cbo_tipo_oferta = new javax.swing.JComboBox<>();
+        cmb_tipo_oferta = new javax.swing.JComboBox<>();
         jLabel1 = new javax.swing.JLabel();
         btn_guardar = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
+        btn_eliminar = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
         btn_buscar_producto = new javax.swing.JButton();
         jLabel4 = new javax.swing.JLabel();
@@ -189,12 +317,17 @@ public class crear_oferta extends javax.swing.JFrame {
         chk_publicar = new javax.swing.JCheckBox();
         txt_hasta = new javax.swing.JFormattedTextField();
         txt_desde = new javax.swing.JFormattedTextField();
+        cmb_tipo_oferta_hide = new javax.swing.JComboBox<>();
+        Codigo = new javax.swing.JLabel();
+        lbl_oferta = new javax.swing.JLabel();
+        jLabel9 = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
         btn_buscar = new javax.swing.JButton();
         btn_nuevo = new javax.swing.JButton();
-        jComboBox1 = new javax.swing.JComboBox<>();
+        cmb_tienda = new javax.swing.JComboBox<>();
         jLabel8 = new javax.swing.JLabel();
+        cmb_tienda_hide = new javax.swing.JComboBox<>();
 
         jInternalFrame1.setVisible(true);
 
@@ -278,6 +411,7 @@ public class crear_oferta extends javax.swing.JFrame {
         );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setAlwaysOnTop(true);
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 formWindowClosing(evt);
@@ -295,7 +429,23 @@ public class crear_oferta extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        tbl_productos.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                tbl_productosKeyPressed(evt);
+            }
+        });
         jScrollPane1.setViewportView(tbl_productos);
+
+        cmb_tipo_oferta.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                cmb_tipo_ofertaItemStateChanged(evt);
+            }
+        });
+        cmb_tipo_oferta.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmb_tipo_ofertaActionPerformed(evt);
+            }
+        });
 
         jLabel1.setText("Tipo Oferta");
 
@@ -306,7 +456,12 @@ public class crear_oferta extends javax.swing.JFrame {
             }
         });
 
-        jButton2.setText("Cancelar");
+        btn_eliminar.setText("Eliminar");
+        btn_eliminar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_eliminarActionPerformed(evt);
+            }
+        });
 
         jLabel2.setText("Agregar producto");
 
@@ -344,6 +499,12 @@ public class crear_oferta extends javax.swing.JFrame {
             }
         });
 
+        Codigo.setText("Codigo");
+
+        lbl_oferta.setText("...");
+
+        jLabel9.setText("Para Eliminar un producto presione la tecla supr");
+
         javax.swing.GroupLayout pnl_detalleLayout = new javax.swing.GroupLayout(pnl_detalle);
         pnl_detalle.setLayout(pnl_detalleLayout);
         pnl_detalleLayout.setHorizontalGroup(
@@ -359,17 +520,21 @@ public class crear_oferta extends javax.swing.JFrame {
                             .addGroup(pnl_detalleLayout.createSequentialGroup()
                                 .addGroup(pnl_detalleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jLabel2)
-                                    .addComponent(jLabel1))
+                                    .addComponent(jLabel1)
+                                    .addComponent(Codigo))
                                 .addGap(18, 18, 18)
                                 .addGroup(pnl_detalleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(pnl_detalleLayout.createSequentialGroup()
-                                        .addComponent(cbo_tipo_oferta, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(75, 75, 75)
-                                        .addComponent(chk_publicar))
                                     .addComponent(btn_buscar_producto)
                                     .addGroup(pnl_detalleLayout.createSequentialGroup()
                                         .addGap(29, 29, 29)
-                                        .addComponent(jLabel6))))
+                                        .addComponent(jLabel6))
+                                    .addGroup(pnl_detalleLayout.createSequentialGroup()
+                                        .addGroup(pnl_detalleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                            .addComponent(cmb_tipo_oferta_hide, javax.swing.GroupLayout.Alignment.LEADING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                            .addComponent(cmb_tipo_oferta, javax.swing.GroupLayout.Alignment.LEADING, 0, 180, Short.MAX_VALUE))
+                                        .addGap(75, 75, 75)
+                                        .addComponent(chk_publicar))
+                                    .addComponent(lbl_oferta)))
                             .addGroup(pnl_detalleLayout.createSequentialGroup()
                                 .addComponent(jLabel4)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -378,28 +543,37 @@ public class crear_oferta extends javax.swing.JFrame {
                                 .addComponent(jLabel5)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(txt_hasta, javax.swing.GroupLayout.PREFERRED_SIZE, 146, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnl_detalleLayout.createSequentialGroup()
-                        .addGap(22, 22, 22)
-                        .addComponent(jButton2)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btn_guardar)))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnl_detalleLayout.createSequentialGroup()
-                .addGap(0, 0, Short.MAX_VALUE)
+                .addContainerGap()
+                .addComponent(jLabel9)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jLabel7)
-                .addGap(284, 284, 284))
+                .addGap(293, 293, 293))
+            .addGroup(pnl_detalleLayout.createSequentialGroup()
+                .addGap(22, 22, 22)
+                .addComponent(btn_eliminar)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(btn_guardar)
+                .addGap(51, 51, 51))
         );
         pnl_detalleLayout.setVerticalGroup(
             pnl_detalleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnl_detalleLayout.createSequentialGroup()
-                .addContainerGap(39, Short.MAX_VALUE)
+                .addContainerGap()
+                .addGroup(pnl_detalleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(Codigo)
+                    .addComponent(lbl_oferta))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 14, Short.MAX_VALUE)
                 .addGroup(pnl_detalleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(chk_publicar)
                     .addGroup(pnl_detalleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(cbo_tipo_oferta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(cmb_tipo_oferta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(jLabel1)))
-                .addGap(26, 26, 26)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(cmb_tipo_oferta_hide, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(3, 3, 3)
                 .addGroup(pnl_detalleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
                     .addComponent(btn_buscar_producto))
@@ -411,14 +585,19 @@ public class crear_oferta extends javax.swing.JFrame {
                     .addComponent(jLabel5)
                     .addComponent(txt_hasta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txt_desde, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(20, 20, 20)
-                .addComponent(jLabel7)
-                .addGap(16, 16, 16)
+                .addGap(18, 18, 18)
+                .addGroup(pnl_detalleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(pnl_detalleLayout.createSequentialGroup()
+                        .addComponent(jLabel7)
+                        .addGap(18, 18, 18))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnl_detalleLayout.createSequentialGroup()
+                        .addComponent(jLabel9)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)))
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 123, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addGroup(pnl_detalleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btn_guardar)
-                    .addComponent(jButton2))
+                    .addComponent(btn_eliminar))
                 .addContainerGap())
         );
 
@@ -439,7 +618,11 @@ public class crear_oferta extends javax.swing.JFrame {
             }
         });
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        cmb_tienda.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                cmb_tiendaItemStateChanged(evt);
+            }
+        });
 
         jLabel8.setText("Tienda");
 
@@ -448,7 +631,7 @@ public class crear_oferta extends javax.swing.JFrame {
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap(157, Short.MAX_VALUE)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                         .addComponent(jLabel3)
@@ -456,7 +639,9 @@ public class crear_oferta extends javax.swing.JFrame {
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                         .addComponent(jLabel8)
                         .addGap(56, 56, 56)
-                        .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(cmb_tienda_hide, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(cmb_tienda, 0, 141, Short.MAX_VALUE))
                         .addGap(77, 77, 77)
                         .addComponent(btn_buscar)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -470,11 +655,13 @@ public class crear_oferta extends javax.swing.JFrame {
                 .addComponent(jLabel3)
                 .addGap(36, 36, 36)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cmb_tienda, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel8)
                     .addComponent(btn_buscar)
                     .addComponent(btn_nuevo))
-                .addContainerGap(42, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(cmb_tienda_hide, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -521,18 +708,252 @@ public class crear_oferta extends javax.swing.JFrame {
     }//GEN-LAST:event_txt_desdeActionPerformed
 
     private void btn_buscar_productoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_buscar_productoActionPerformed
+        if (cmb_tipo_oferta.getSelectedIndex() == -1) {
+            JOptionPane.showMessageDialog(this, "Seleccione un tipo de oferta");
+        } else {
+            modal_productos.getObj(this).setVisible(true);
+        }
 
-        modal_productos.getObj(this).setVisible(true);
     }//GEN-LAST:event_btn_buscar_productoActionPerformed
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         limpiar_form();
+        obj = null;
     }//GEN-LAST:event_formWindowClosing
 
     private void btn_guardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_guardarActionPerformed
         WsOferta ws = new WsOferta();
-        ws.WSfn_GuardaEncabezadoOferta("", "", 1, 1);
+        if (validarOferta()) {
+
+            String tipo = "";
+            String fechaI = txt_desde.getText().toString().trim();
+            String fechaF = txt_hasta.getText().toString().trim();
+            Integer isPublica = 0;
+            Integer tipoOferta = 0;
+            Integer tienda = 0;
+            Integer ofertaId = 0;
+
+            String[] parts = cmb_tipo_oferta_hide.getSelectedItem().toString().split(":");
+            tipoOferta = Integer.parseInt(parts[0]);
+
+            String[] partsTienda = cmb_tienda_hide.getSelectedItem().toString().split(":");
+            tienda = Integer.parseInt(partsTienda[0]);
+
+            if (chk_publicar.isSelected()) {
+                isPublica = 1;
+            }
+
+            if (lbl_oferta.getText().equals("...")) {
+                tipo = "do";
+                String respuesta = ws.WSfn_GuardaEncabezadoOferta(tipo, fechaI, fechaF, isPublica, tipoOferta, tienda, 0);
+                if (MensajeGuardar(respuesta)) {
+                    int IdOferta = Integer.parseInt(respuesta);
+                    ActualizarDetalle(IdOferta);
+                }
+
+            } else {
+                tipo = "set";
+                ofertaId = Integer.parseInt(lbl_oferta.getText());
+                String respuesta = ws.WSfn_GuardaEncabezadoOferta(tipo, fechaI, fechaF, isPublica, tipoOferta, tienda, ofertaId);
+                ActualizarDetalle(ofertaId);
+                MensajeActualiza(respuesta);
+            }
+
+        }
+
     }//GEN-LAST:event_btn_guardarActionPerformed
+
+    public void ActualizaPrecio() {
+        WsOferta ws = new WsOferta();
+        for (int row = 0; row < tableModelP.getRowCount(); row++) {
+
+            Integer pOferta = 0;
+            Integer precio = Integer.parseInt(tableModelP.getValueAt(row, 3).toString());
+            String tipo_oferta = cmb_tipo_oferta.getSelectedItem().toString();
+
+            if (tipo_oferta.contains("%")) {
+                String[] parts = tipo_oferta.split("%");
+                int porcentaje = Integer.parseInt(parts[0]);
+                pOferta = (precio - (precio * porcentaje / 100));
+            } else {
+                if (tipo_oferta.contains("x")) {
+                    String[] parts = tipo_oferta.split("x");
+                    int divisor = Integer.parseInt(parts[0]);
+                    pOferta = (precio / divisor);
+                }
+            }
+
+            tableModelP.setValueAt(pOferta, row, 4);
+        }
+
+    }
+
+    public void ActualizarDetalle(Integer oft_id) {
+        WsOferta ws = new WsOferta();
+        for (int row = 0; row < tableModelP.getRowCount(); row++) {
+
+            String tipo = "";
+
+            Integer prd_id = Integer.parseInt(tableModelP.getValueAt(row, 0).toString());
+            Integer precio = Integer.parseInt(tableModelP.getValueAt(row, 4).toString());
+
+            Integer dto_id = Integer.parseInt(tableModelP.getValueAt(row, 5).toString());
+            if (dto_id == -1) {
+                tipo = "do";
+
+            } else {
+                tipo = "set";
+            }
+
+            ws.WSfn_GuardarDetalle(tipo, oft_id, prd_id, precio, dto_id);
+
+        }
+
+    }
+
+    public boolean MensajeGuardar(String respuesta) {
+
+        String mensaje = "";
+        boolean retorno = false;
+        if (!respuesta.equals("")) {
+            try {
+                Integer.parseInt(respuesta);
+                mensaje = "Oferta registrada Correctamente";
+                retorno = true;
+                limpiar_form();
+            } catch (Exception ex) {
+                mensaje = "Error WS: " + respuesta;
+            }
+
+        } else {
+            mensaje = "Error de comunicacion, no se pudo guardar";
+
+        }
+        JOptionPane.showMessageDialog(this, mensaje);
+        return retorno;
+    }
+
+    public void MensajeActualiza(String respuesta) {
+
+        String mensaje = "";
+        if (!respuesta.equals("")) {
+
+            mensaje = respuesta;
+            limpiar_form();
+
+        } else {
+            mensaje = "Error de comunicacion, no se pudo actualizar";
+
+        }
+        JOptionPane.showMessageDialog(this, mensaje);
+    }
+
+    public boolean validarOferta() {
+
+        String mensaje = "";
+        boolean valida = true;
+
+        if (cmb_tienda.getSelectedIndex() == -1) {
+            mensaje = "Seleccione una tienda";
+            valida = false;
+        }
+        if (valida == true & cmb_tipo_oferta.getSelectedIndex() == -1) {
+            mensaje = "Seleccione un tipo de oferta";
+            valida = false;
+        }
+        if (valida == true & txt_desde.getText().toString().trim().equals("")) {
+            mensaje = "ingrese fecha de inicio para campaña";
+            valida = false;
+        }
+        if (valida == true & txt_hasta.getText().toString().trim().equals("")) {
+            mensaje = "ingrese fecha de termino para campaña";
+            valida = false;
+        }
+        if (valida == true & tableModelP.getRowCount() == 0) {
+            mensaje = "ingrese al menos un producto";
+            valida = false;
+        }
+
+        if (valida == false) {
+            JOptionPane.showMessageDialog(this, mensaje);
+        }
+
+        return valida;
+    }
+    private void cmb_tipo_ofertaItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmb_tipo_ofertaItemStateChanged
+        if (evt.getStateChange() == ItemEvent.SELECTED) {
+
+            Integer index = cmb_tipo_oferta.getSelectedIndex();
+            if (cmb_tipo_oferta_hide.getSelectedIndex() > -1) {
+                cmb_tipo_oferta_hide.setSelectedIndex(index);
+                ActualizaPrecio();
+            }
+
+            //JOptionPane.showMessageDialog(null, (String) evt.getItem());
+        }
+    }//GEN-LAST:event_cmb_tipo_ofertaItemStateChanged
+
+    private void cmb_tipo_ofertaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmb_tipo_ofertaActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_cmb_tipo_ofertaActionPerformed
+
+    private void cmb_tiendaItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cmb_tiendaItemStateChanged
+        if (evt.getStateChange() == ItemEvent.SELECTED) {
+
+            Integer index = cmb_tienda.getSelectedIndex();
+            if (cmb_tienda_hide.getSelectedIndex() > -1) {
+                cmb_tienda_hide.setSelectedIndex(index);
+            }
+
+            //JOptionPane.showMessageDialog(null, (String) evt.getItem());
+        }
+    }//GEN-LAST:event_cmb_tiendaItemStateChanged
+
+    private void tbl_productosKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tbl_productosKeyPressed
+        if (evt.getKeyCode() == KeyEvent.VK_DELETE) {
+            Integer respuesta = JOptionPane.showConfirmDialog(this, "¿Esta Seguro que desea Eliminar?", "Productos", JOptionPane.YES_NO_OPTION);
+            if (respuesta == JOptionPane.YES_OPTION) {
+
+                try {
+                    int selectedRow = tbl_productos.getSelectedRow();
+
+                    if (!lbl_oferta.getText().toString().equals("...")) {
+                        String retorno = "";
+                        WsOferta ws = new WsOferta();
+
+                        String sId = tbl_productos.getModel().getValueAt(tbl_productos.getSelectedRow(), 5).toString();
+
+                        ((DefaultTableModel) tbl_productos.getModel()).removeRow(selectedRow);
+                        Integer detalleId = Integer.parseInt(sId);
+                        retorno = ws.WSfn_EliminarDetalleOferta(detalleId);
+                        MensajeGuardar(retorno);
+
+                    }
+
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(this, "Error al eliminar producto :" + ex.getMessage().toString());
+                }
+
+            }
+        }
+    }//GEN-LAST:event_tbl_productosKeyPressed
+
+    private void btn_eliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_eliminarActionPerformed
+        if (!lbl_oferta.getText().equals("...")) {
+
+            Integer respuesta = JOptionPane.showConfirmDialog(this, "¿Esta Seguro que desea Eliminar?", "Productos", JOptionPane.YES_NO_OPTION);
+            if (respuesta == JOptionPane.YES_OPTION) {
+                WsOferta ws = new WsOferta();
+
+                String retorno = "";
+                int id_oferta = Integer.parseInt(lbl_oferta.getText().toString());
+
+                retorno = ws.WSfn_EliminarOferta(id_oferta);
+                JOptionPane.showMessageDialog(this, retorno);
+            }
+
+        }
+    }//GEN-LAST:event_btn_eliminarActionPerformed
 
     /**
      * @param args the command line arguments
@@ -570,14 +991,17 @@ public class crear_oferta extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel Codigo;
     private javax.swing.JButton btn_buscar;
     private javax.swing.JButton btn_buscar_producto;
+    private javax.swing.JButton btn_eliminar;
     private javax.swing.JButton btn_guardar;
     private javax.swing.JButton btn_nuevo;
-    private javax.swing.JComboBox<String> cbo_tipo_oferta;
     private javax.swing.JCheckBox chk_publicar;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JComboBox<String> jComboBox1;
+    private javax.swing.JComboBox<String> cmb_tienda;
+    private javax.swing.JComboBox<String> cmb_tienda_hide;
+    private javax.swing.JComboBox<String> cmb_tipo_oferta;
+    private javax.swing.JComboBox<String> cmb_tipo_oferta_hide;
     private javax.swing.JDialog jDialog1;
     private javax.swing.JDialog jDialog2;
     private javax.swing.JDialog jDialog3;
@@ -593,8 +1017,10 @@ public class crear_oferta extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JLabel lbl_oferta;
     private javax.swing.JPanel pnl_detalle;
     private javax.swing.JTable tbl_productos;
     private javax.swing.JFormattedTextField txt_desde;

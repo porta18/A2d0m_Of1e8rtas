@@ -9,7 +9,7 @@ import Vista.modal.modal_tiendas;
 import java.awt.event.ItemEvent;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
-import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
+//import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 
 /**
  *
@@ -18,24 +18,27 @@ import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 public class adm_tiendas extends javax.swing.JFrame {
 
     private static adm_tiendas obj = null;
+    private static Home first = null;
 
     public adm_tiendas() {
         initComponents();
+        this.setLocationRelativeTo(null);
         pnl_detalle.setVisible(false);
 
-        AutoCompleteDecorator.decorate(cbo_comuna);
+        //AutoCompleteDecorator.decorate(cbo_comuna);
         cbo_comuna.addItem("uno");
         cbo_comuna.addItem("dos");
         cbo_comuna.addItem("tres");
 
-        AutoCompleteDecorator.decorate(cbo_comuna_hide);
+        //AutoCompleteDecorator.decorate(cbo_comuna_hide);
         cbo_comuna_hide.addItem("Visible: String :1");
         cbo_comuna_hide.addItem("Visible: String :2");
         cbo_comuna_hide.addItem("Visible: String :3");
     }
 
     //este codigo esta para que no se abra mas de una vez el formulario
-    public static adm_tiendas getObj() {
+    public static adm_tiendas getObj(Home f) {
+        first = f;
         if (obj == null) {
             obj = new adm_tiendas();
         }
@@ -78,6 +81,12 @@ public class adm_tiendas extends javax.swing.JFrame {
         cbo_comuna_hide = new javax.swing.JComboBox<>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setAlwaysOnTop(true);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+        });
 
         btn_nuevo.setText("Nuevo");
         btn_nuevo.addActionListener(new java.awt.event.ActionListener() {
@@ -251,6 +260,11 @@ public class adm_tiendas extends javax.swing.JFrame {
         }
 
     }//GEN-LAST:event_cbo_comunaItemStateChanged
+
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        limpiar_form();
+        obj = null;
+    }//GEN-LAST:event_formWindowClosing
 
     /**
      * @param args the command line arguments

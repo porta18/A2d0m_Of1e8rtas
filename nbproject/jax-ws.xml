@@ -2,9 +2,9 @@
 <jax-ws xmlns="http://www.netbeans.org/ns/jax-ws/1">
   <services/>
   <clients>
-    <client name="Service1">
-      <wsdl-url>http://fvsoluciones-001-site1.ftempurl.com/Service1.svc?singleWsdl</wsdl-url>
-      <local-wsdl-file>fvsoluciones-001-site1.ftempurl.com/Service1.svc.singlewsdl.wsdl</local-wsdl-file>
+    <client name="Consultas">
+      <wsdl-url>http://fvsoluciones-001-site4.ftempurl.com/Consultas.svc?wsdl</wsdl-url>
+      <local-wsdl-file>fvsoluciones-001-site4.ftempurl.com/Consultas.svc.wsdl</local-wsdl-file>
       <package-name>org.tempuri</package-name>
       <catalog-file>catalog.xml</catalog-file>
       <wsimport-options>
@@ -22,7 +22,7 @@
         </wsimport-option>
         <wsimport-option>
           <wsimport-option-name>wsdlLocation</wsimport-option-name>
-          <wsimport-option-value>http://fvsoluciones-001-site1.ftempurl.com/Service1.svc?singleWsdl</wsimport-option-value>
+          <wsimport-option-value>http://fvsoluciones-001-site4.ftempurl.com/Consultas.svc?wsdl</wsimport-option-value>
         </wsimport-option>
         <wsimport-option>
           <wsimport-option-name>xnocompile</wsimport-option-name>

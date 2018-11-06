@@ -25,6 +25,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.ListSelectionModel;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -59,7 +60,7 @@ public class modal_ofertas extends javax.swing.JFrame {
                 Element rootNode = document.getRootElement();
                 java.util.List<Element> list = rootNode.getChildren("Table");
 
-                String encabezadoTabla[] = {"ID", "Campaña", "Publica", "Cant. Productos", "Fecha inicio", "Fecha Termino", "Ispublica", "Tipo oferta"};
+                String encabezadoTabla[] = {"ID", "Tipo","Campaña", "Publica", "Cant. Productos", "Fecha inicio", "Fecha Termino", "Ispublica", "Tipo oferta"};
                 DefaultTableModel tableModel = new DefaultTableModel(encabezadoTabla, 0);
 
                 for (int i = 0; i < list.size(); i++) {
@@ -67,6 +68,7 @@ public class modal_ofertas extends javax.swing.JFrame {
                     Element node = (Element) list.get(i);
 
                     String id = node.getChildText("OFT_ID");
+                    String tipo = node.getChildText("T_OFT_DESCRIPCION");
                     String campania = node.getChildText("CAMPANIA");
                     String publica = node.getChildText("ES_PUBLICA");
                     String cantProductos = node.getChildText("CANTIDAD_PRODUCTOS");
@@ -75,17 +77,17 @@ public class modal_ofertas extends javax.swing.JFrame {
                     String codIspubica = node.getChildText("OFT_PUBLICA");
                     String tipoOferta = node.getChildText("T_OFT_ID");
 
-                    Object[] objs = {id, campania, publica, cantProductos, fechaIni, fechaFin, codIspubica, tipoOferta};
+                    Object[] objs = {id, tipo,campania, publica, cantProductos, fechaIni, fechaFin, codIspubica, tipoOferta};
                     tableModel.addRow(objs);
                 }
                 tbl_ofertas.setModel(tableModel);
                 /*bloqueo la tabla para no ser editada*/
                 tbl_ofertas.setDefaultEditor(Object.class, null);
 
-                tbl_ofertas.removeColumn(tbl_ofertas.getColumnModel().getColumn(4));
-                tbl_ofertas.removeColumn(tbl_ofertas.getColumnModel().getColumn(4));
-                tbl_ofertas.removeColumn(tbl_ofertas.getColumnModel().getColumn(4));
-                tbl_ofertas.removeColumn(tbl_ofertas.getColumnModel().getColumn(4));
+                tbl_ofertas.removeColumn(tbl_ofertas.getColumnModel().getColumn(5));
+                tbl_ofertas.removeColumn(tbl_ofertas.getColumnModel().getColumn(5));
+                tbl_ofertas.removeColumn(tbl_ofertas.getColumnModel().getColumn(5));
+                tbl_ofertas.removeColumn(tbl_ofertas.getColumnModel().getColumn(5));
 
             } catch (JDOMException ex) {
                 Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
@@ -102,8 +104,13 @@ public class modal_ofertas extends javax.swing.JFrame {
 
     public modal_ofertas() {
         initComponents();
+        this.setLocationRelativeTo(null);
+        tbl_ofertas.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         pnl_info.setVisible(false);
-        cargarTablaOfertas(1);
+        
+        Usuario usu = UsuarioSesion.UsuSesion;
+        int tienda_id = usu.getTienda_id();
+        cargarTablaOfertas(tienda_id);
 
     }
 
@@ -134,6 +141,12 @@ public class modal_ofertas extends javax.swing.JFrame {
         lbl_mensaje = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setAlwaysOnTop(true);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+        });
 
         tbl_ofertas.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -252,23 +265,22 @@ public class modal_ofertas extends javax.swing.JFrame {
 
     private void tbl_ofertasMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbl_ofertasMousePressed
         if (evt.getButton() == MouseEvent.BUTTON1 && evt.getClickCount() == 2) {
-
+            seleccionar_oferta();
         }
     }//GEN-LAST:event_tbl_ofertasMousePressed
 
-    private void btn_seleccionarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_seleccionarActionPerformed
-
-        String auxId = tbl_ofertas.getValueAt(tbl_ofertas.getSelectedRow(), 0).toString();
+    public void seleccionar_oferta(){
+         String auxId = tbl_ofertas.getValueAt(tbl_ofertas.getSelectedRow(), 0).toString();
 
         if (auxId.trim().equals("")) {
-            JOptionPane.showMessageDialog(null, "Seleccione una oferta");
+            JOptionPane.showMessageDialog(this, "Seleccione una oferta");
         } else {
             Integer id = Integer.parseInt(auxId);
             String data2 = tbl_ofertas.getValueAt(tbl_ofertas.getSelectedRow(), 1).toString();
-            String fechaIni = tbl_ofertas.getModel().getValueAt(tbl_ofertas.getSelectedRow(), 4).toString();
-            String fechaFin = tbl_ofertas.getModel().getValueAt(tbl_ofertas.getSelectedRow(), 5).toString();
-            String auxPublica = tbl_ofertas.getModel().getValueAt(tbl_ofertas.getSelectedRow(), 6).toString();
-            String auxTipoOferta = tbl_ofertas.getModel().getValueAt(tbl_ofertas.getSelectedRow(), 7).toString();
+            String fechaIni = tbl_ofertas.getModel().getValueAt(tbl_ofertas.getSelectedRow(), 5).toString();
+            String fechaFin = tbl_ofertas.getModel().getValueAt(tbl_ofertas.getSelectedRow(), 6).toString();
+            String auxPublica = tbl_ofertas.getModel().getValueAt(tbl_ofertas.getSelectedRow(), 7).toString();
+            String auxTipoOferta = tbl_ofertas.getModel().getValueAt(tbl_ofertas.getSelectedRow(), 8).toString();
 
             Integer publica = Integer.parseInt(auxPublica);
             Integer tipoOferta = Integer.parseInt(auxTipoOferta);
@@ -297,9 +309,14 @@ public class modal_ofertas extends javax.swing.JFrame {
                 e.printStackTrace();
             }
         }
-
-
+    }
+    private void btn_seleccionarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_seleccionarActionPerformed
+        seleccionar_oferta();
     }//GEN-LAST:event_btn_seleccionarActionPerformed
+
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        obj = null;
+    }//GEN-LAST:event_formWindowClosing
 
     /**
      * @param args the command line arguments

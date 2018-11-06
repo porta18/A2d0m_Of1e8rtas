@@ -15,7 +15,7 @@ public class WsUsuario {
          
         org.tempuri.Consultas service = new org.tempuri.Consultas();
         org.tempuri.IConsultas port = service.getBasicHttpBindingIConsultas();
-        return port.loginUsuario("jquezada", "123");
+        return port.loginUsuario(usu, pass);
     }
 
    

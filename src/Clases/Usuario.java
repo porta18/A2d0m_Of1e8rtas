@@ -19,7 +19,8 @@ public class Usuario {
     private  int tipo_usuario;
     private  String descripcion_tipo_usuario;
     private  int persona_id;
-    
+    private Persona persona;
+    private int tienda_id;
     
 
 
@@ -85,6 +86,22 @@ public class Usuario {
 
     public void setDescripcion_tipo_usuario(String descripcion_tipo_usuario) {
         this.descripcion_tipo_usuario = descripcion_tipo_usuario;
+    }
+
+    public Persona getPersona() {
+        return persona;
+    }
+
+    public void setPersona(Persona persona) {
+        this.persona = persona;
+    }
+
+    public int getTienda_id() {
+        return tienda_id;
+    }
+
+    public void setTienda_id(int tienda_id) {
+        this.tienda_id = tienda_id;
     }
     
     

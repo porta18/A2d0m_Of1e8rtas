@@ -16,22 +16,22 @@
             <classpath path="${libs.jaxws21.classpath}"/>
         </taskdef>
     </target>
-    <target name="wsimport-client-Service1" depends="wsimport-init">
-        <mkdir dir="${build.generated.dir}/jax-wsCache/Service1"/>
-        <property name="wsdl-Service1" location="xml-resources/web-service-references/Service1/wsdl/fvsoluciones-001-site1.ftempurl.com/Service1.svc.singlewsdl.wsdl"/>
-        <wsimport sourcedestdir="${build.generated.dir}/jax-wsCache/Service1" destdir="${build.generated.dir}/jax-wsCache/Service1" wsdl="${wsdl-Service1}" catalog="catalog.xml" encoding="${source.encoding}" extension="true" verbose="true" fork="false" wsdlLocation="http://fvsoluciones-001-site1.ftempurl.com/Service1.svc?singleWsdl" xnocompile="true" xendorsed="true">
-            <depends file="${wsdl-Service1}"/>
-            <produces dir="${build.generated.dir}/jax-wsCache/Service1"/>
+    <target name="wsimport-client-Consultas" depends="wsimport-init">
+        <mkdir dir="${build.generated.dir}/jax-wsCache/Consultas"/>
+        <property name="wsdl-Consultas" location="xml-resources/web-service-references/Consultas/wsdl/fvsoluciones-001-site4.ftempurl.com/Consultas.svc.wsdl"/>
+        <wsimport sourcedestdir="${build.generated.dir}/jax-wsCache/Consultas" destdir="${build.generated.dir}/jax-wsCache/Consultas" wsdl="${wsdl-Consultas}" catalog="catalog.xml" encoding="${source.encoding}" extension="true" verbose="true" fork="false" wsdlLocation="http://fvsoluciones-001-site4.ftempurl.com/Consultas.svc?wsdl" xnocompile="true" xendorsed="true">
+            <depends file="${wsdl-Consultas}"/>
+            <produces dir="${build.generated.dir}/jax-wsCache/Consultas"/>
         </wsimport>
         <copy todir="${build.generated.sources.dir}/jax-ws">
-            <fileset dir="${build.generated.dir}/jax-wsCache/Service1">
+            <fileset dir="${build.generated.dir}/jax-wsCache/Consultas">
                 <include name="**/*.java"/>
             </fileset>
         </copy>
     </target>
-    <target name="wsimport-client-clean-Service1" depends="-init-project">
-        <delete dir="${build.generated.dir}/jax-wsCache/Service1"/>
+    <target name="wsimport-client-clean-Consultas" depends="-init-project">
+        <delete dir="${build.generated.dir}/jax-wsCache/Consultas"/>
         <delete dir="${build.generated.sources.dir}/jax-ws/org/tempuri"/>
     </target>
-    <target name="wsimport-client-generate" depends="wsimport-client-Service1"/>
+    <target name="wsimport-client-generate" depends="wsimport-client-Consultas"/>
 </project>

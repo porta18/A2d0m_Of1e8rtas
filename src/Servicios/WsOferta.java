@@ -5,11 +5,22 @@
  */
 package Servicios;
 
+import Negocio.Funciones;
+import java.io.StringWriter;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
+import javax.xml.namespace.QName;
 
 /**
  *
@@ -38,23 +49,48 @@ public class WsOferta {
         return port.traeOfertaDetalle(oft_id);
     }
 
-    public String WSfn_GuardaEncabezadoOferta(java.lang.String pFechaIni, java.lang.String pFechaFin,
-            java.lang.Integer isPublica, java.lang.Integer tipoOoferta) {
+    public String WSfn_TraerTipoOferta(java.lang.Integer oft_id) {
 
-        org.tempuri.Mantenedores service = new org.tempuri.Mantenedores();
-        org.tempuri.IMantenedores port = service.getBasicHttpBindingIMantenedores();
+        org.tempuri.Consultas service = new org.tempuri.Consultas();
+        org.tempuri.IConsultas port = service.getBasicHttpBindingIConsultas();
+        return port.traeTipoOferta(oft_id);
+    }
 
-        XMLGregorianCalendar gregDate = null;
-        try {
-            gregDate = DatatypeFactory.newInstance().newXMLGregorianCalendar();
-        } catch (DatatypeConfigurationException ex) {
-            Logger.getLogger(WsOferta.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        gregDate.setYear(2019);
-        gregDate.setMonth(10);
-        gregDate.setDay(28);
+    public String WSfn_GuardaEncabezadoOferta(java.lang.String tipo, java.lang.String pFechaIni, java.lang.String pFechaFin,
+            java.lang.Integer isPublica, java.lang.Integer tipoOoferta, java.lang.Integer tienda, java.lang.Integer id_oferta) {
+
+        org.tempuri.Consultas service = new org.tempuri.Consultas();
+        org.tempuri.IConsultas port = service.getBasicHttpBindingIConsultas();
+
+        Funciones fn = new Funciones();
+
+        XMLGregorianCalendar gregDateI = fn.retornaFechaXml(pFechaIni);
+        XMLGregorianCalendar gregDateF = fn.retornaFechaXml(pFechaFin);;
 
         //return port.crearOferta(pFechaInicio, pFechaFin, isPublica, tipoOoferta)
-        return port.guardarOferta("do", gregDate, gregDate, isPublica, tipoOoferta,1,9);
+        return port.guardarOferta(tipo, gregDateI, gregDateF, isPublica, tipoOoferta, tienda, id_oferta);
+
     }
+
+    public String WSfn_EliminarOferta(java.lang.Integer oft_id) {
+
+        org.tempuri.Consultas service = new org.tempuri.Consultas();
+        org.tempuri.IConsultas port = service.getBasicHttpBindingIConsultas();
+        return port.eliminarOferta(oft_id);
+    }
+
+    public String WSfn_EliminarDetalleOferta(java.lang.Integer d_oft_id) {
+
+        org.tempuri.Consultas service = new org.tempuri.Consultas();
+        org.tempuri.IConsultas port = service.getBasicHttpBindingIConsultas();
+        return port.eliminarDetOferta(d_oft_id);
+    }
+
+    public String WSfn_GuardarDetalle(java.lang.String tipo,java.lang.Integer oft_id, java.lang.Integer prod_id,java.lang.Integer precio, java.lang.Integer dto_id) {
+
+        org.tempuri.Consultas service = new org.tempuri.Consultas();
+        org.tempuri.IConsultas port = service.getBasicHttpBindingIConsultas();
+        return port.guardarDetalleOferta(oft_id, prod_id, precio,dto_id);
+    }
+
 }
