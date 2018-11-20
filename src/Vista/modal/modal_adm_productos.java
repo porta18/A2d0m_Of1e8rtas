@@ -5,6 +5,7 @@
  */
 package Vista.modal;
 
+import Clases.ImagenProducto;
 import Clases.Producto;
 import Servicios.WsOferta;
 import Servicios.WsProducto;
@@ -36,7 +37,6 @@ public class modal_adm_productos extends javax.swing.JFrame {
 
     private static modal_adm_productos obj = null;
     private static Integer tiendaId;
-
 
     public static modal_adm_productos getObj(adm_productos f, Integer tnd_id) {
         first = f;
@@ -72,7 +72,7 @@ public class modal_adm_productos extends javax.swing.JFrame {
                 Element rootNode = document.getRootElement();
                 java.util.List<Element> list = rootNode.getChildren("Table");
 
-                String encabezadoTabla[] = {"ID", "Cod Barra", "Descripcion", "Precio venta", "Precio compra", "Categoria", "Categoria ID"};
+                String encabezadoTabla[] = {"ID", "Cod Barra", "Descripcion", "Precio venta", "Precio compra", "Categoria", "Categoria ID", "imagen","id imagen"};
                 DefaultTableModel tableModel = new DefaultTableModel(encabezadoTabla, 0);
 
                 for (int i = 0; i < list.size(); i++) {
@@ -86,14 +86,18 @@ public class modal_adm_productos extends javax.swing.JFrame {
                     String precioCompra = node.getChildText("PRD_PRECIO_COMPRA");
                     String categoria = node.getChildText("CTG_DESCRIPCION");
                     String categoria_id = node.getChildText("CATEGORIA_CTG_ID");
+                    String imagen = node.getChildText("IPR_NOMBRE_ARCHIVO");
+                    String idImagen = node.getChildText("IPR_ID");
 
-                    Object[] objs = {id, cod_barra, descripcion, precio, precioCompra, categoria, categoria_id};
+                    Object[] objs = {id, cod_barra, descripcion, precio, precioCompra, categoria, categoria_id, imagen,idImagen};
                     tableModel.addRow(objs);
                 }
                 tbl_productos.setModel(tableModel);
                 /*bloqueo la tabla para no ser editada*/
                 tbl_productos.setDefaultEditor(Object.class, null);
 
+                tbl_productos.removeColumn(tbl_productos.getColumnModel().getColumn(5));
+                tbl_productos.removeColumn(tbl_productos.getColumnModel().getColumn(5));
                 tbl_productos.removeColumn(tbl_productos.getColumnModel().getColumn(5));
                 tbl_productos.removeColumn(tbl_productos.getColumnModel().getColumn(5));
 
@@ -259,10 +263,17 @@ public class modal_adm_productos extends javax.swing.JFrame {
             String auxPrecioVenta = tbl_productos.getModel().getValueAt(tbl_productos.getSelectedRow(), 3).toString();
             String auxPrecioCompra = tbl_productos.getModel().getValueAt(tbl_productos.getSelectedRow(), 4).toString();
             String auxCategoriaId = tbl_productos.getModel().getValueAt(tbl_productos.getSelectedRow(), 6).toString();
+            String imagen = tbl_productos.getModel().getValueAt(tbl_productos.getSelectedRow(), 7).toString();
+            String auxIdImagen = tbl_productos.getModel().getValueAt(tbl_productos.getSelectedRow(), 8).toString();
 
             Integer precioVenta = Integer.parseInt(auxPrecioVenta);
             Integer precioCompra = Integer.parseInt(auxPrecioCompra);
             Integer categoriaId = Integer.parseInt(auxCategoriaId);
+            Integer idImagen = Integer.parseInt(auxIdImagen);
+
+            ImagenProducto img = new ImagenProducto();
+            img.setId(idImagen);
+            img.setNombre(imagen);
 
             Producto pro = new Producto();
             pro.setId(id);
@@ -271,6 +282,7 @@ public class modal_adm_productos extends javax.swing.JFrame {
             pro.setDescripcion(descripcion);
             pro.setPrecioVenta(precioVenta);
             pro.setCategoriaId(categoriaId);
+            pro.setImagen(img);
 
             first.agregar_producto(pro);
             obj = null;
@@ -280,7 +292,7 @@ public class modal_adm_productos extends javax.swing.JFrame {
     }//GEN-LAST:event_btn_seleccionarActionPerformed
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
-       obj = null;
+        obj = null;
     }//GEN-LAST:event_formWindowClosing
 
     /**

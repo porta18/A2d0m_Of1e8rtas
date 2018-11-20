@@ -5,6 +5,7 @@
  */
 package Vista;
 
+import Clases.GoogleMail;
 import Vista.modal.modal_productos;
 import Vista.modal.modal_ofertas;
 import Clases.Oferta;
@@ -22,6 +23,7 @@ import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.mail.MessagingException;
 import javax.swing.JOptionPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
@@ -39,7 +41,7 @@ import org.jdom2.input.SAXBuilder;
  */
 public class crear_oferta extends javax.swing.JFrame {
 
-    public String encabezadoTablaP[] = {"ID", "Cod Barra", "Descripcion", "Precio venta", "Precio Oferta","id"};
+    public String encabezadoTablaP[] = {"ID", "Cod Barra", "Descripcion", "Precio venta", "Precio Oferta", "id"};
     public DefaultTableModel tableModelP = new DefaultTableModel(encabezadoTablaP, 0);
 
     private static crear_oferta obj = null;
@@ -49,7 +51,7 @@ public class crear_oferta extends javax.swing.JFrame {
 
     public crear_oferta() {
         initComponents();
-      
+
         tbl_productos.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         this.setLocationRelativeTo(null);
         pnl_detalle.setVisible(false);
@@ -270,8 +272,13 @@ public class crear_oferta extends javax.swing.JFrame {
         tbl_productos.setModel(tableModelP);
         /*bloqueo la tabla para no ser editada*/
         tbl_productos.setDefaultEditor(Object.class, null);
-        
-        tbl_productos.removeColumn(tbl_productos.getColumnModel().getColumn(5));
+
+        try {
+            tbl_productos.removeColumn(tbl_productos.getColumnModel().getColumn(5));
+        } catch (Exception ex) {
+
+        }
+
     }
 
     public void limpiar_form() {
@@ -321,6 +328,9 @@ public class crear_oferta extends javax.swing.JFrame {
         Codigo = new javax.swing.JLabel();
         lbl_oferta = new javax.swing.JLabel();
         jLabel9 = new javax.swing.JLabel();
+        jLabel10 = new javax.swing.JLabel();
+        jLabel11 = new javax.swing.JLabel();
+        jLabel12 = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
         btn_buscar = new javax.swing.JButton();
@@ -505,6 +515,13 @@ public class crear_oferta extends javax.swing.JFrame {
 
         jLabel9.setText("Para Eliminar un producto presione la tecla supr");
 
+        jLabel10.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jLabel10.setText("Nota:");
+
+        jLabel11.setText("Cada vez que se guarde una oferta publica con fecha de campaña");
+
+        jLabel12.setText(" vigente se notificara a los consumidores via email");
+
         javax.swing.GroupLayout pnl_detalleLayout = new javax.swing.GroupLayout(pnl_detalle);
         pnl_detalle.setLayout(pnl_detalleLayout);
         pnl_detalleLayout.setHorizontalGroup(
@@ -513,71 +530,87 @@ public class crear_oferta extends javax.swing.JFrame {
                 .addGroup(pnl_detalleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(pnl_detalleLayout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 666, Short.MAX_VALUE))
+                        .addComponent(jScrollPane1))
                     .addGroup(pnl_detalleLayout.createSequentialGroup()
                         .addGap(23, 23, 23)
                         .addGroup(pnl_detalleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel1)
+                            .addComponent(Codigo)
+                            .addComponent(jLabel4))
+                        .addGap(18, 18, 18)
+                        .addGroup(pnl_detalleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lbl_oferta)
                             .addGroup(pnl_detalleLayout.createSequentialGroup()
+                                .addGroup(pnl_detalleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                    .addComponent(cmb_tipo_oferta_hide, javax.swing.GroupLayout.Alignment.LEADING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(cmb_tipo_oferta, javax.swing.GroupLayout.Alignment.LEADING, 0, 180, Short.MAX_VALUE))
+                                .addGap(75, 75, 75)
                                 .addGroup(pnl_detalleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel2)
-                                    .addComponent(jLabel1)
-                                    .addComponent(Codigo))
-                                .addGap(18, 18, 18)
-                                .addGroup(pnl_detalleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(btn_buscar_producto)
+                                    .addComponent(chk_publicar)
                                     .addGroup(pnl_detalleLayout.createSequentialGroup()
-                                        .addGap(29, 29, 29)
-                                        .addComponent(jLabel6))
-                                    .addGroup(pnl_detalleLayout.createSequentialGroup()
-                                        .addGroup(pnl_detalleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                            .addComponent(cmb_tipo_oferta_hide, javax.swing.GroupLayout.Alignment.LEADING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                            .addComponent(cmb_tipo_oferta, javax.swing.GroupLayout.Alignment.LEADING, 0, 180, Short.MAX_VALUE))
-                                        .addGap(75, 75, 75)
-                                        .addComponent(chk_publicar))
-                                    .addComponent(lbl_oferta)))
-                            .addGroup(pnl_detalleLayout.createSequentialGroup()
-                                .addComponent(jLabel4)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(txt_desde, javax.swing.GroupLayout.PREFERRED_SIZE, 146, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(34, 34, 34)
-                                .addComponent(jLabel5)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(txt_hasta, javax.swing.GroupLayout.PREFERRED_SIZE, 146, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                        .addComponent(jLabel10)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addGroup(pnl_detalleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(jLabel12)
+                                            .addComponent(jLabel11))))))
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnl_detalleLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel9)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jLabel7)
-                .addGap(293, 293, 293))
             .addGroup(pnl_detalleLayout.createSequentialGroup()
                 .addGap(22, 22, 22)
                 .addComponent(btn_eliminar)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(btn_guardar)
                 .addGap(51, 51, 51))
+            .addGroup(pnl_detalleLayout.createSequentialGroup()
+                .addGroup(pnl_detalleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(pnl_detalleLayout.createSequentialGroup()
+                        .addGap(186, 186, 186)
+                        .addComponent(jLabel6))
+                    .addGroup(pnl_detalleLayout.createSequentialGroup()
+                        .addGap(274, 274, 274)
+                        .addComponent(jLabel5)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(txt_hasta, javax.swing.GroupLayout.PREFERRED_SIZE, 146, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(pnl_detalleLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(pnl_detalleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(txt_desde, javax.swing.GroupLayout.PREFERRED_SIZE, 146, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel9))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jLabel7)
+                .addGap(106, 106, 106)
+                .addComponent(jLabel2)
+                .addGap(18, 18, 18)
+                .addComponent(btn_buscar_producto)
+                .addGap(19, 19, 19))
         );
         pnl_detalleLayout.setVerticalGroup(
             pnl_detalleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnl_detalleLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(pnl_detalleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(Codigo)
-                    .addComponent(lbl_oferta))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 14, Short.MAX_VALUE)
+                .addGroup(pnl_detalleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(pnl_detalleLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(Codigo)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnl_detalleLayout.createSequentialGroup()
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(lbl_oferta)
+                        .addGap(18, 18, 18)))
                 .addGroup(pnl_detalleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(chk_publicar)
                     .addGroup(pnl_detalleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(cmb_tipo_oferta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(jLabel1)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(cmb_tipo_oferta_hide, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(pnl_detalleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel10)
+                    .addGroup(pnl_detalleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(cmb_tipo_oferta_hide, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabel11)))
                 .addGap(3, 3, 3)
-                .addGroup(pnl_detalleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel2)
-                    .addComponent(btn_buscar_producto))
-                .addGap(18, 18, 18)
+                .addComponent(jLabel12)
+                .addGap(1, 1, 1)
                 .addComponent(jLabel6)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(pnl_detalleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -585,11 +618,14 @@ public class crear_oferta extends javax.swing.JFrame {
                     .addComponent(jLabel5)
                     .addComponent(txt_hasta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txt_desde, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
+                .addGap(38, 38, 38)
                 .addGroup(pnl_detalleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(pnl_detalleLayout.createSequentialGroup()
-                        .addComponent(jLabel7)
-                        .addGap(18, 18, 18))
+                        .addGroup(pnl_detalleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel7)
+                            .addComponent(jLabel2)
+                            .addComponent(btn_buscar_producto))
+                        .addGap(13, 13, 13))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnl_detalleLayout.createSequentialGroup()
                         .addComponent(jLabel9)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)))
@@ -631,7 +667,7 @@ public class crear_oferta extends javax.swing.JFrame {
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap(157, Short.MAX_VALUE)
+                .addContainerGap(189, Short.MAX_VALUE)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                         .addComponent(jLabel3)
@@ -758,6 +794,15 @@ public class crear_oferta extends javax.swing.JFrame {
                 ActualizarDetalle(ofertaId);
                 MensajeActualiza(respuesta);
             }
+            GoogleMail email = new GoogleMail();
+            
+            try{
+                email.Html();
+                email.Send("misofertas18", "misofertas123", "joseeqb2@gmail.com","", "ofertas retail", "String mensaje");
+            }catch(Exception ex){
+                 JOptionPane.showMessageDialog(this, "Error al enviar correo: " + ex);
+            }
+            
 
         }
 
@@ -804,9 +849,8 @@ public class crear_oferta extends javax.swing.JFrame {
             } else {
                 tipo = "set";
             }
-
-            ws.WSfn_GuardarDetalle(tipo, oft_id, prd_id, precio, dto_id);
-
+            String resDetalle = resDetalle = ws.WSfn_GuardarDetalle(tipo, oft_id, prd_id, precio, dto_id);
+            //JOptionPane.showMessageDialog(this, resDetalle);
         }
 
     }
@@ -927,6 +971,7 @@ public class crear_oferta extends javax.swing.JFrame {
                         Integer detalleId = Integer.parseInt(sId);
                         retorno = ws.WSfn_EliminarDetalleOferta(detalleId);
                         MensajeGuardar(retorno);
+                        limpiar_form();
 
                     }
 
@@ -950,6 +995,7 @@ public class crear_oferta extends javax.swing.JFrame {
 
                 retorno = ws.WSfn_EliminarOferta(id_oferta);
                 JOptionPane.showMessageDialog(this, retorno);
+                limpiar_form();
             }
 
         }
@@ -1010,6 +1056,9 @@ public class crear_oferta extends javax.swing.JFrame {
     private javax.swing.JInternalFrame jInternalFrame1;
     private javax.swing.JInternalFrame jInternalFrame2;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
+    private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;

@@ -18,6 +18,8 @@ public class Producto {
     private Integer categoriaId;
     private Integer precioVenta;
     private Integer precioCompra;
+    private ImagenProducto imagen;
+    
 
     public Integer getId() {
         return id;
@@ -74,6 +76,15 @@ public class Producto {
     public void setPrecioCompra(Integer precioCompra) {
         this.precioCompra = precioCompra;
     }
+
+    public ImagenProducto getImagen() {
+        return imagen;
+    }
+
+    public void setImagen(ImagenProducto imagen) {
+        this.imagen = imagen;
+    }
+
     
     
 }

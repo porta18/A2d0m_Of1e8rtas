@@ -12,6 +12,7 @@ import Servicios.WsCategoria;
 import Servicios.WsOferta;
 import Servicios.WsProducto;
 import Servicios.WsTienda;
+import Vista.modal.modal_adm_imagen;
 import Vista.modal.modal_adm_productos;
 import Vista.modal.modal_productos;
 import java.awt.event.ItemEvent;
@@ -40,12 +41,15 @@ public class adm_productos extends javax.swing.JFrame {
      */
     private static adm_productos obj = null;
     private static Home first = null;
+    private String imagen = "0";
+    private Integer idImagen = 0;
 
     public adm_productos() {
         initComponents();
         this.setLocationRelativeTo(null);
         pnl_detalle.setVisible(false);
 
+        imagen = "0";
         Usuario usu = UsuarioSesion.UsuSesion;
 
         cargarTiendas(usu.getTienda_id());
@@ -172,7 +176,7 @@ public class adm_productos extends javax.swing.JFrame {
         txt_precio_c = new javax.swing.JTextField();
         jLabel7 = new javax.swing.JLabel();
         txt_precio_v = new javax.swing.JTextField();
-        jButton1 = new javax.swing.JButton();
+        btn_ver_imagen = new javax.swing.JButton();
         jLabel9 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -280,7 +284,12 @@ public class adm_productos extends javax.swing.JFrame {
 
         jLabel7.setText("Precio venta");
 
-        jButton1.setText("Ver");
+        btn_ver_imagen.setText("Ver");
+        btn_ver_imagen.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_ver_imagenActionPerformed(evt);
+            }
+        });
 
         jLabel9.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         jLabel9.setText("administrar imagenes");
@@ -324,7 +333,7 @@ public class adm_productos extends javax.swing.JFrame {
                     .addGroup(pnl_detalleLayout.createSequentialGroup()
                         .addComponent(jLabel9)
                         .addGap(18, 18, 18)
-                        .addComponent(jButton1)))
+                        .addComponent(btn_ver_imagen)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         pnl_detalleLayout.setVerticalGroup(
@@ -355,7 +364,7 @@ public class adm_productos extends javax.swing.JFrame {
                     .addComponent(txt_precio_v, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(pnl_detalleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton1)
+                    .addComponent(btn_ver_imagen)
                     .addComponent(jLabel9))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 40, Short.MAX_VALUE)
                 .addGroup(pnl_detalleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -416,7 +425,8 @@ public class adm_productos extends javax.swing.JFrame {
         txt_nombre.setText(pr.getDescripcion());
         txt_precio_c.setText(pr.getPrecioCompra().toString());
         txt_precio_v.setText(pr.getPrecioVenta().toString());
-
+        this.imagen = pr.getImagen().getNombre();
+        this.idImagen = pr.getImagen().getId();
         Integer categoria = pr.getCategoriaId();
 
         int size = cbo_categoria_hide.getItemCount();
@@ -529,6 +539,33 @@ public class adm_productos extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btn_eliminarActionPerformed
 
+    private void btn_ver_imagenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_ver_imagenActionPerformed
+
+        if (lbl_codigo.getText().equals("...")) {
+            JOptionPane.showMessageDialog(this, "Para agregar una imagen, primero debe registrar el producto");
+
+        } else {
+            String nombre = "";
+            String cod_barra = txt_codigo_barra.getText().toString().trim();
+
+            String item = cmb_tienda_hide.getSelectedItem().toString();
+            String[] parts = item.split(":");
+
+            String tienda = parts[0];
+            String rutaImagen = this.imagen;
+            Integer id = Integer.parseInt(lbl_codigo.getText());
+            Integer idImg = this.idImagen;
+            if (cod_barra.equals("")) {
+                JOptionPane.showMessageDialog(this, "debe ingresar el campo codigo barra");
+            } else {
+                nombre = cod_barra + '_' + tienda;
+                modal_adm_imagen.getObj(this, nombre, id, rutaImagen, idImagen).setVisible(true);
+            }
+
+        }
+
+    }//GEN-LAST:event_btn_ver_imagenActionPerformed
+
     public void MensajeGuardar(String respuesta) {
 
         String mensaje = "";
@@ -575,7 +612,7 @@ public class adm_productos extends javax.swing.JFrame {
         if (valida == true & txt_codigo_barra.getText().toString().trim().equals("")) {
             mensaje = "Ingrese Codigo de barra";
             valida = false;
-        } else {
+        } else if (valida == true) {
             try {
                 Integer.parseInt(txt_codigo_barra.getText());
             } catch (Exception ex) {
@@ -594,7 +631,7 @@ public class adm_productos extends javax.swing.JFrame {
         if (valida == true & txt_precio_c.getText().toString().trim().equals("")) {
             mensaje = "ingrese precio de compra";
             valida = false;
-        } else {
+        } else if (valida == true) {
             try {
                 Integer.parseInt(txt_precio_c.getText().replace(".", ""));
             } catch (Exception ex) {
@@ -605,7 +642,7 @@ public class adm_productos extends javax.swing.JFrame {
         if (valida == true & txt_precio_v.getText().toString().trim().equals("")) {
             mensaje = "ingrese precio de venta";
             valida = false;
-        } else {
+        } else if (valida == true) {
             try {
                 Integer.parseInt(txt_precio_v.getText().replace(".", ""));
             } catch (Exception ex) {
@@ -661,11 +698,11 @@ public class adm_productos extends javax.swing.JFrame {
     private javax.swing.JButton btn_eliminar;
     private javax.swing.JButton btn_guardar;
     private javax.swing.JButton btn_nuevo;
+    private javax.swing.JButton btn_ver_imagen;
     private javax.swing.JComboBox<String> cbo_categoria;
     private javax.swing.JComboBox<String> cbo_categoria_hide;
     private javax.swing.JComboBox<String> cmb_tienda;
     private javax.swing.JComboBox<String> cmb_tienda_hide;
-    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;

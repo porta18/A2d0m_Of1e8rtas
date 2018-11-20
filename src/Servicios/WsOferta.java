@@ -90,7 +90,7 @@ public class WsOferta {
 
         org.tempuri.Consultas service = new org.tempuri.Consultas();
         org.tempuri.IConsultas port = service.getBasicHttpBindingIConsultas();
-        return port.guardarDetalleOferta(oft_id, prod_id, precio,dto_id);
+        return port.guardarDetalleOferta(tipo,oft_id,prod_id,precio,dto_id);
     }
 
 }

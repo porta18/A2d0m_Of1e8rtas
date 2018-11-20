@@ -5,10 +5,27 @@
  */
 package Vista;
 
+import Clases.Oferta;
+import Clases.Tienda;
+import Servicios.WsComuna;
+import Servicios.WsPersona;
+import Servicios.WsTienda;
+import Servicios.WsUsuario;
 import Vista.modal.modal_tiendas;
 import java.awt.event.ItemEvent;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.text.Format;
+import java.text.SimpleDateFormat;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.input.SAXBuilder;
 //import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 
 /**
@@ -24,16 +41,77 @@ public class adm_tiendas extends javax.swing.JFrame {
         initComponents();
         this.setLocationRelativeTo(null);
         pnl_detalle.setVisible(false);
+        cbo_comuna_hide.setVisible(false);
+        cargarComunas(0);
 
-        //AutoCompleteDecorator.decorate(cbo_comuna);
-        cbo_comuna.addItem("uno");
-        cbo_comuna.addItem("dos");
-        cbo_comuna.addItem("tres");
+    }
 
-        //AutoCompleteDecorator.decorate(cbo_comuna_hide);
-        cbo_comuna_hide.addItem("Visible: String :1");
-        cbo_comuna_hide.addItem("Visible: String :2");
-        cbo_comuna_hide.addItem("Visible: String :3");
+    public void cargarComunas(Integer tnd_id) {
+
+        WsComuna ws = new WsComuna();
+        String retorno = "";
+        retorno = ws.WSfn_TraerComunas(tnd_id);
+
+        if (!retorno.equals("<NewDataSet />")) {
+            try {
+                SAXBuilder builder = new SAXBuilder();
+
+                InputStream stream = new ByteArrayInputStream(retorno.getBytes("UTF-8"));
+                Document document = builder.build(stream);
+
+                //Document document = (Document) builder.build(retorno);
+                Element rootNode = document.getRootElement();
+                java.util.List<Element> list = rootNode.getChildren("Table");
+
+                cbo_comuna.addItem("Seleccione");
+                cbo_comuna_hide.addItem("-1" + ':' + "Seleccione");
+                for (int i = 0; i < list.size(); i++) {
+
+                    Element node = (Element) list.get(i);
+
+                    String id = node.getChildText("CMN_ID");
+                    String descripcion = node.getChildText("CMN_DESCRIPCION");
+                    String region = node.getChildText("CMN_DESCRIPCION");
+
+                    cbo_comuna.addItem(descripcion);
+                    cbo_comuna_hide.addItem(id + ':' + descripcion + ':' + region);
+
+                }
+
+            } catch (JDOMException ex) {
+                Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+        }
+
+    }
+
+    public void cargar_tienda(Tienda tienda) {
+        pnl_detalle.setVisible(true);
+
+        Integer tnd_id = tienda.getId();
+        String nombre = tienda.getNombre();
+        String direccion = tienda.getDireccion();
+        Integer comuna = tienda.getId();
+
+        int size = cbo_comuna_hide.getItemCount();
+        for (int i = 0; i < size; i++) {
+            String item = cbo_comuna_hide.getItemAt(i);
+            String[] parts = item.split(":");
+            int id = Integer.parseInt(parts[0]);
+            if (id == comuna) {
+                cbo_comuna_hide.setSelectedIndex(i);
+                cbo_comuna.setSelectedIndex(i);
+                i = size;
+            }
+        }
+
+        txt_nombre.setText(nombre);
+        txt_direccion.setText(direccion);
+        lbl_codigo.setText(tnd_id.toString());
+
     }
 
     //este codigo esta para que no se abra mas de una vez el formulario
@@ -49,8 +127,10 @@ public class adm_tiendas extends javax.swing.JFrame {
 
         txt_direccion.setText("");
         txt_nombre.setText("");
-        txt_nombre_tienda.setText("");
+        txt_nombre.setText("");
         lbl_codigo.setText("...");
+        cbo_comuna.setSelectedIndex(0);
+        cbo_comuna_hide.setSelectedIndex(0);
     }
 
     /**
@@ -65,7 +145,6 @@ public class adm_tiendas extends javax.swing.JFrame {
         pnl_busqueda = new javax.swing.JPanel();
         btn_nuevo = new javax.swing.JButton();
         btn_buscar = new javax.swing.JButton();
-        txt_nombre_tienda = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
         pnl_detalle = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
@@ -102,8 +181,6 @@ public class adm_tiendas extends javax.swing.JFrame {
             }
         });
 
-        txt_nombre_tienda.setToolTipText("Ingrese codigo o nombre de la tienda");
-
         jLabel2.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
         jLabel2.setText("Administracion de Tiendas");
 
@@ -112,9 +189,7 @@ public class adm_tiendas extends javax.swing.JFrame {
         pnl_busquedaLayout.setHorizontalGroup(
             pnl_busquedaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnl_busquedaLayout.createSequentialGroup()
-                .addGap(39, 39, 39)
-                .addComponent(txt_nombre_tienda, javax.swing.GroupLayout.PREFERRED_SIZE, 309, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(btn_buscar)
                 .addGap(27, 27, 27)
                 .addComponent(btn_nuevo)
@@ -131,7 +206,6 @@ public class adm_tiendas extends javax.swing.JFrame {
                 .addComponent(jLabel2)
                 .addGap(18, 18, 18)
                 .addGroup(pnl_busquedaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txt_nombre_tienda, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btn_buscar)
                     .addComponent(btn_nuevo))
                 .addGap(21, 21, 21))
@@ -140,8 +214,18 @@ public class adm_tiendas extends javax.swing.JFrame {
         jLabel1.setText("Codigo");
 
         btn_guardar.setText("Guardar");
+        btn_guardar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_guardarActionPerformed(evt);
+            }
+        });
 
         btn_eliminar.setText("Eliminar");
+        btn_eliminar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_eliminarActionPerformed(evt);
+            }
+        });
 
         jLabel3.setText("Nombre");
 
@@ -162,34 +246,39 @@ public class adm_tiendas extends javax.swing.JFrame {
         pnl_detalleLayout.setHorizontalGroup(
             pnl_detalleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnl_detalleLayout.createSequentialGroup()
-                .addGap(52, 52, 52)
-                .addComponent(btn_eliminar)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(btn_guardar)
-                .addGap(45, 45, 45))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnl_detalleLayout.createSequentialGroup()
-                .addContainerGap()
                 .addGroup(pnl_detalleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel3)
-                    .addComponent(jLabel4)
-                    .addComponent(jLabel5)
-                    .addComponent(jLabel1))
-                .addGap(40, 40, 40)
-                .addGroup(pnl_detalleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lbl_codigo)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnl_detalleLayout.createSequentialGroup()
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(pnl_detalleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(pnl_detalleLayout.createSequentialGroup()
+                                .addComponent(jLabel1)
+                                .addGap(38, 38, 38)
+                                .addComponent(lbl_codigo))
+                            .addGroup(pnl_detalleLayout.createSequentialGroup()
+                                .addGroup(pnl_detalleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel3)
+                                    .addComponent(jLabel5))
+                                .addGap(44, 44, 44)
+                                .addGroup(pnl_detalleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(cbo_comuna_hide, javax.swing.GroupLayout.PREFERRED_SIZE, 153, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGroup(pnl_detalleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                        .addComponent(txt_nombre)
+                                        .addComponent(cbo_comuna, javax.swing.GroupLayout.PREFERRED_SIZE, 196, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                            .addGroup(pnl_detalleLayout.createSequentialGroup()
+                                .addComponent(jLabel4)
+                                .addGap(40, 40, 40)
+                                .addComponent(txt_direccion, javax.swing.GroupLayout.PREFERRED_SIZE, 491, javax.swing.GroupLayout.PREFERRED_SIZE))))
                     .addGroup(pnl_detalleLayout.createSequentialGroup()
-                        .addGroup(pnl_detalleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(txt_nombre)
-                            .addComponent(txt_direccion)
-                            .addComponent(cbo_comuna, 0, 196, Short.MAX_VALUE))
-                        .addGap(34, 34, 34)
-                        .addComponent(cbo_comuna_hide, javax.swing.GroupLayout.PREFERRED_SIZE, 153, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(153, 153, 153))
+                        .addGap(30, 30, 30)
+                        .addComponent(btn_eliminar)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btn_guardar)))
+                .addGap(56, 56, 56))
         );
         pnl_detalleLayout.setVerticalGroup(
             pnl_detalleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnl_detalleLayout.createSequentialGroup()
-                .addGap(80, 80, 80)
+                .addContainerGap()
                 .addGroup(pnl_detalleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
                     .addComponent(lbl_codigo))
@@ -201,16 +290,17 @@ public class adm_tiendas extends javax.swing.JFrame {
                 .addGroup(pnl_detalleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4)
                     .addComponent(txt_direccion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(22, 22, 22)
+                .addGap(25, 25, 25)
                 .addGroup(pnl_detalleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel5)
-                    .addComponent(cbo_comuna, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(cbo_comuna_hide, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 52, Short.MAX_VALUE)
+                    .addComponent(cbo_comuna, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(cbo_comuna_hide, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(29, 29, 29)
                 .addGroup(pnl_detalleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btn_guardar)
-                    .addComponent(btn_eliminar))
-                .addGap(37, 37, 37))
+                    .addComponent(btn_eliminar)
+                    .addComponent(btn_guardar))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -229,9 +319,9 @@ public class adm_tiendas extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(pnl_busqueda, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 11, Short.MAX_VALUE)
-                .addComponent(pnl_detalle, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 23, Short.MAX_VALUE)
+                .addComponent(pnl_detalle, javax.swing.GroupLayout.PREFERRED_SIZE, 241, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
 
         pack();
@@ -265,6 +355,125 @@ public class adm_tiendas extends javax.swing.JFrame {
         limpiar_form();
         obj = null;
     }//GEN-LAST:event_formWindowClosing
+
+    private void btn_guardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_guardarActionPerformed
+        WsTienda ws = new WsTienda();
+        if (validarTienda()) {
+
+            String item = cbo_comuna_hide.getSelectedItem().toString();
+            String[] parts = item.split(":");
+
+            String nombre = txt_nombre.getText().toString().trim();
+            String direccion = txt_direccion.getText().toString().trim();
+            Integer comuna = Integer.parseInt(parts[0]);
+
+            String tipo = "";
+
+            if (lbl_codigo.getText().equals("...")) {
+
+                tipo = "do";
+                String respuesta = ws.WSfn_GuardarTienda(tipo, nombre, direccion, comuna, 0);
+                MensajeGuardar(respuesta);
+
+            } else {
+                tipo = "set";
+                Integer prsId = Integer.parseInt(lbl_codigo.getText());
+                String respuesta = ws.WSfn_GuardarTienda(tipo, nombre, direccion, comuna, prsId);
+                MensajeActualiza(respuesta);
+
+            }
+        }
+    }//GEN-LAST:event_btn_guardarActionPerformed
+
+    private void btn_eliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_eliminarActionPerformed
+        if (!lbl_codigo.getText().equals("...")) {
+
+            Integer respuesta = JOptionPane.showConfirmDialog(this, "¿Esta Seguro que desea Eliminar?", "Tienda", JOptionPane.YES_NO_OPTION);
+            if (respuesta == JOptionPane.YES_OPTION) {
+                WsTienda ws = new WsTienda();
+
+                String retorno = "";
+                int id = Integer.parseInt(lbl_codigo.getText().toString());
+
+                retorno = ws.WSfn_EliminarTienda(id);
+                JOptionPane.showMessageDialog(this, retorno);
+                limpiar_form();
+            }
+
+        }
+    }//GEN-LAST:event_btn_eliminarActionPerformed
+
+    public void MensajeActualiza(String respuesta) {
+
+        String mensaje = "";
+        if (!respuesta.equals("")) {
+
+            mensaje = respuesta;
+            //limpiar_form();
+
+        } else {
+            mensaje = "Error de comunicacion, no se pudo actualizar";
+
+        }
+        JOptionPane.showMessageDialog(this, mensaje);
+    }
+
+    public boolean MensajeGuardar(String respuesta) {
+
+        String mensaje = "";
+        boolean retorno = false;
+        if (!respuesta.equals("")) {
+            try {
+                Integer.parseInt(respuesta);
+                mensaje = "Tienda registrada Correctamente";
+                retorno = true;
+                limpiar_form();
+            } catch (Exception ex) {
+                mensaje = respuesta;
+            }
+
+        } else {
+            mensaje = "Error de comunicacion, no se pudo guardar";
+
+        }
+        JOptionPane.showMessageDialog(this, mensaje);
+        return retorno;
+    }
+
+    public boolean validarTienda() {
+        String mensaje = "";
+        boolean valida = true;
+
+        if (txt_nombre.getText().toString().trim().equals("")) {
+            mensaje = "ingrese nombre de la tienda";
+            valida = false;
+        }
+        if (valida == true & txt_direccion.getText().toString().trim().equals("")) {
+            mensaje = "ingrese direccion de la tienda";
+            valida = false;
+        }
+
+        if (valida == true & cbo_comuna_hide.getSelectedIndex() == -1) {
+            mensaje = "Seleccione una comuna";
+            valida = false;
+        } else if (valida == true & cbo_comuna_hide.getSelectedIndex() != -1) {
+
+            String item = cbo_comuna_hide.getSelectedItem().toString();
+            String[] parts = item.split(":");
+            if (parts[0].toString().equals("-1")) {
+                mensaje = "Seleccione una comuna";
+                valida = false;
+            }
+
+        }
+
+        if (valida == false) {
+            JOptionPane.showMessageDialog(this, mensaje);
+        }
+
+        return valida;
+
+    }
 
     /**
      * @param args the command line arguments
@@ -319,6 +528,5 @@ public class adm_tiendas extends javax.swing.JFrame {
     private javax.swing.JPanel pnl_detalle;
     private javax.swing.JTextField txt_direccion;
     private javax.swing.JTextField txt_nombre;
-    private javax.swing.JTextField txt_nombre_tienda;
     // End of variables declaration//GEN-END:variables
 }

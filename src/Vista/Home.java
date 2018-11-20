@@ -37,7 +37,8 @@ public class Home extends javax.swing.JFrame {
 
     public void cotrol_vista() {
         Usuario usu = UsuarioSesion.UsuSesion;
-
+        
+        mi_descuentos.setVisible(false);
         int perfil;
         perfil = usu.getTipo_usuario();
         switch (perfil) {
@@ -102,7 +103,6 @@ public class Home extends javax.swing.JFrame {
         mi_resumen_tienda = new javax.swing.JMenuItem();
         jMenu8 = new javax.swing.JMenu();
         mi_notificar_oferta = new javax.swing.JMenuItem();
-        jMenuItem6 = new javax.swing.JMenuItem();
 
         jMenu3.setText("File");
         jMenuBar2.add(jMenu3);
@@ -262,9 +262,6 @@ public class Home extends javax.swing.JFrame {
         mi_notificar_oferta.setEnabled(false);
         jMenu8.add(mi_notificar_oferta);
 
-        jMenuItem6.setText("jMenuItem6");
-        jMenu8.add(jMenuItem6);
-
         jMenuBar1.add(jMenu8);
 
         setJMenuBar(jMenuBar1);
@@ -365,7 +362,6 @@ public class Home extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu8;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuBar jMenuBar2;
-    private javax.swing.JMenuItem jMenuItem6;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JLabel lblCargoLoad;

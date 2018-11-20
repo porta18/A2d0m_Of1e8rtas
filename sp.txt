@@ -1,1 +1,14 @@
-al limpiar cmbo dejar en primer item
+metodo
+
+		- guardar_encargado_tienda [OK] falta web service SP_GUARDAR_ENCARGADO_TIENDA
+		- traer consumidores para envio de ofertas [OK] falta web service SP_WEB_TRAE_CONSUM_OFERTA 
+		- envio de correo (marcar usaurios como notificados) [ok] falta web service SP_GUARDAR_NOTIFICACION
+	- traer ofertas para envio de correo
+	- agregar una imagen para indicar que se esta procesando
+	- aregar seleccione en los combobox tiendas y usuarios [OK]
+	- traer tienda de usuario encargado de tienda
+	- generar archivo bi
+	- reporte cu 17
+	- generar pdf con puntos
+	- cerrar session debe cerrar ventanas abiertas
+	

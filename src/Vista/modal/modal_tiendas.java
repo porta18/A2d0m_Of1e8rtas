@@ -5,6 +5,9 @@
  */
 package Vista.modal;
 
+import Clases.Comuna;
+import Clases.Oferta;
+import Clases.Tienda;
 import Servicios.WsOferta;
 import Servicios.WsTienda;
 import Vista.Login;
@@ -12,8 +15,12 @@ import Vista.adm_tiendas;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
 import org.jdom2.Document;
@@ -32,13 +39,14 @@ public class modal_tiendas extends javax.swing.JFrame {
      */
     private static adm_tiendas first = null;
     private static modal_tiendas obj = null;
+
     public modal_tiendas() {
         initComponents();
         this.setLocationRelativeTo(null);
-         tbl_tiendas.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-         cargarTablaTiendas(0);
+        tbl_tiendas.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        cargarTablaTiendas(0);
     }
-    
+
     public static modal_tiendas getObj(adm_tiendas f) {
         first = f;
         if (obj == null) {
@@ -46,7 +54,7 @@ public class modal_tiendas extends javax.swing.JFrame {
         }
         return obj;
     }
-    
+
     public void cargarTablaTiendas(Integer tnd_id) {
 
         WsTienda ws = new WsTienda();
@@ -75,7 +83,6 @@ public class modal_tiendas extends javax.swing.JFrame {
                     String nombre = node.getChildText("TND_DESCRIPCION");
                     String direccion = node.getChildText("TND_DIRECCION");
                     String comunaId = node.getChildText("COMUNA_CMN_ID");
-      
 
                     Object[] objs = {id, nombre, direccion, comunaId};
                     tableModel.addRow(objs);
@@ -85,7 +92,6 @@ public class modal_tiendas extends javax.swing.JFrame {
                 tbl_tiendas.setDefaultEditor(Object.class, null);
 
                 tbl_tiendas.removeColumn(tbl_tiendas.getColumnModel().getColumn(3));
-               
 
             } catch (JDOMException ex) {
                 Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
@@ -100,6 +106,35 @@ public class modal_tiendas extends javax.swing.JFrame {
 
     }
 
+    public void seleccionar_tienda() {
+        String auxId = tbl_tiendas.getValueAt(tbl_tiendas.getSelectedRow(), 0).toString();
+
+        if (auxId.trim().equals("")) {
+            JOptionPane.showMessageDialog(this, "Seleccione una tienda");
+        } else {
+            Integer id = Integer.parseInt(auxId);
+            String descripcion = tbl_tiendas.getValueAt(tbl_tiendas.getSelectedRow(), 1).toString();
+            String direccion = tbl_tiendas.getModel().getValueAt(tbl_tiendas.getSelectedRow(), 2).toString();
+            String auxComunaId = tbl_tiendas.getModel().getValueAt(tbl_tiendas.getSelectedRow(), 3).toString();
+
+            Integer comunaId = Integer.parseInt(auxComunaId);
+
+            Comuna cmn = new Comuna();
+            Tienda tnd = new Tienda();
+
+            cmn.setId(comunaId);
+
+            tnd.setComuna(cmn);
+            tnd.setId(id);
+            tnd.setNombre(descripcion);
+            tnd.setDireccion(direccion);
+
+            first.cargar_tienda(tnd);
+            obj = null;
+            this.dispose();
+
+        }
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -141,6 +176,11 @@ public class modal_tiendas extends javax.swing.JFrame {
         jScrollPane1.setViewportView(tbl_tiendas);
 
         btn_seleccionar.setText("Seleccionar");
+        btn_seleccionar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_seleccionarActionPerformed(evt);
+            }
+        });
 
         btn_cancelar.setText("Cancelar");
         btn_cancelar.addActionListener(new java.awt.event.ActionListener() {
@@ -236,6 +276,10 @@ public class modal_tiendas extends javax.swing.JFrame {
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         obj = null;
     }//GEN-LAST:event_formWindowClosing
+
+    private void btn_seleccionarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_seleccionarActionPerformed
+        seleccionar_tienda();
+    }//GEN-LAST:event_btn_seleccionarActionPerformed
 
     /**
      * @param args the command line arguments

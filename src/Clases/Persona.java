@@ -13,6 +13,7 @@ import java.util.Date;
  */
 public class Persona {
     
+    private Integer id;
     private Integer rut;
     private String nombres;
     private String apellido_p;
@@ -20,6 +21,8 @@ public class Persona {
     private Date fecha_nacimiento;
     private Integer t_sexo;
     private String sexo;
+    
+    
 
     public Integer getRut() {
         return rut;
@@ -75,6 +78,14 @@ public class Persona {
 
     public void setSexo(String sexo) {
         this.sexo = sexo;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
     
     

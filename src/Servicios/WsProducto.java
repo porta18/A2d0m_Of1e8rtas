@@ -34,4 +34,21 @@ public class WsProducto {
         org.tempuri.IConsultas port = service.getBasicHttpBindingIConsultas();
         return port.eliminarProducto(prd_id);
     }
+    
+    
+    public String WSfn_GuardarImagenProducto(java.lang.String tipo,java.lang.String archivo,
+                                            java.lang.Integer prd_id,java.lang.Integer id_img) {
+
+        org.tempuri.Consultas service = new org.tempuri.Consultas();
+        org.tempuri.IConsultas port = service.getBasicHttpBindingIConsultas();
+        return port.guardarImagen(tipo,archivo,prd_id,id_img);
+    }
+    
+    public String WSfn_EliminarImagenProducto(java.lang.Integer ipr_id) {
+
+        org.tempuri.Consultas service = new org.tempuri.Consultas();
+        org.tempuri.IConsultas port = service.getBasicHttpBindingIConsultas();
+        return port.eliminarImgProd(ipr_id);
+    }
+    
 }
